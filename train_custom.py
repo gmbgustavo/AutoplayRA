@@ -6,7 +6,6 @@ pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/torch_stable
 
 import optuna
 import callback    # Classe personalizada. Esta na mesma pasta
-import numpy as np
 import os
 from streetfighter import StreetFighter
 from stable_baselines3 import PPO
@@ -54,6 +53,7 @@ def agent_opt(trial):
         return -1000
 
 
+# Apresenta um jogo de demonstração com ações aleatórias, não treina e não carrega o treinamento
 def samplegame():
     env = StreetFighter()
     done = False
@@ -78,10 +78,21 @@ def train():
     env = StreetFighter()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
+    # Parâmetros obtigos pelo estudo do optuna
     model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=0, n_steps=2944,
                 gamma=0.9676075081504855, learning_rate=4.032635382035765e-05, clip_range=0.38952897700692946,
                 gae_lambda=0.8723735222048391)
+    model.load('./save/trial_1_best_model.zip')
     model.learn(total_timesteps=1_500_000, callback=save)
+
+
+def avaliar(pesos):
+    env = StreetFighter()
+    env = Monitor(env, LOG_DIR)
+    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
+    model = PPO.load(pesos)
+    mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=5)
+    return [mean_reward, desvio]
 
 
 def main():
@@ -89,6 +100,5 @@ def main():
 
 
 if __name__ == '__main__':
-    estudar_ppo()
-
+    avaliar('./save/trial_1_best_model.zip')
 

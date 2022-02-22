@@ -22,27 +22,28 @@ class StreetFighter(Env):
         self.observation_space = Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
         self.action_space = MultiBinary(12)
         self.game = retro.make(game=JOGO, use_restricted_actions=retro.Actions.FILTERED)
-        self.previous_frame = None    # Cria uma variavel para armazenar o frame anterior
         self.score = 0
+        self.vida = 176
 
     def reset(self, *args):
         obs = self.game.reset()
         obs = self.preprocess(obs)
-        self.previous_frame = obs
         self.score = 0
+        self.vida = 176
         return obs
 
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
-        # Frame Delta - deixa a observação apenas com os pixels que mudaram para economizar processamento
-        frame_delta = obs - self.previous_frame
-        self.previous_frame = obs
         # Reward
         reward = info['score'] - self.score    # Pontos atuais - pontos anteriores: Ganhou pontos.
         self.score = info['score']    # Armazena o atual para calcular no proximo step
-        # Colocando o fator vida na recompensa
-        return frame_delta, reward, done, info
+        # Colocando o fator vida na recompensa - Se houve decréscimo, penaliza com -100
+        if info['health'] < self.vida:
+            reward -= 100
+        self.vida = info['health']
+
+        return obs, reward, done, info
 
     def render(self, mode='human'):
         self.game.render()
