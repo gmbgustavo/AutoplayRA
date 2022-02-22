@@ -7,7 +7,7 @@ pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/torch_stable
 import optuna
 import callback    # Classe personalizada. Esta na mesma pasta
 import os
-from streetfighter import StreetFighter
+from atarigames import AtariGames
 from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
@@ -16,7 +16,7 @@ from stable_baselines3.common.monitor import Monitor
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save/checkpoint'
-save = callback.TrainAndLoggingCallback(check_freq=50_000, save_path=SAVE_DIR)
+callback = callback.TrainAndLoggingCallback(check_freq=50_000, save_path=SAVE_DIR)
 
 
 # Função para testar os hiperparametros
@@ -24,7 +24,7 @@ def ppo_opt(trial):
     return {
         'n_steps': trial.suggest_int('n_steps', 2048, 8192),
         'gamma': trial.suggest_loguniform('gamma', 0.8, 0.9999),
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1e-3),
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-7, 1e-5),
         'clip_range': trial.suggest_uniform('clip_range', 0.1, 0.4),
         'gae_lambda': trial.suggest_uniform('gae_lambda', 0.8, 0.99)
     }
@@ -34,13 +34,13 @@ def agent_opt(trial):
     try:
         model_params = ppo_opt(trial)
         # Criar o ambiente
-        env = StreetFighter()
+        env = AtariGames()
         env = Monitor(env, LOG_DIR)
         env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
         # Criar o modelo
-        save_dir = os.path.join('./save', 'trial_{}_best_model'.format(trial.number))
+        save_dir = os.path.join('./save', 'trial_{}_model'.format(trial.number))
         model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=0, **model_params)
-        model.learn(total_timesteps=1_500_000)
+        model.learn(total_timesteps=500_000)
 
         # Avaliar o modelo - O underline significa que "não vou usar essas variaveis desempacotadas"
         mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=5)    # Desempacota, mas precisamos somente de 1
@@ -55,7 +55,7 @@ def agent_opt(trial):
 
 # Apresenta um jogo de demonstração com ações aleatórias, não treina e não carrega o treinamento
 def samplegame():
-    env = StreetFighter()
+    env = AtariGames()
     done = False
     env.reset()
     while not done:
@@ -66,6 +66,7 @@ def samplegame():
             print(reward)
             print(info)
     env.close()
+    return None
 
 
 def estudar_ppo():
@@ -74,20 +75,21 @@ def estudar_ppo():
     print(study.best_params)
 
 
-def train():
-    env = StreetFighter()
+def train(peso):
+    env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     # Parâmetros obtigos pelo estudo do optuna
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=0, n_steps=2944,
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1, n_steps=2944,
                 gamma=0.9676075081504855, learning_rate=4.032635382035765e-05, clip_range=0.38952897700692946,
                 gae_lambda=0.8723735222048391)
-    model.load('./save/trial_1_best_model.zip')
-    model.learn(total_timesteps=1_500_000, callback=save)
+    model.load(peso)
+    model.learn(total_timesteps=1_500_000, callback=callback)
+    return None
 
 
 def avaliar(pesos):
-    env = StreetFighter()
+    env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = PPO.load(pesos)
@@ -96,9 +98,9 @@ def avaliar(pesos):
 
 
 def main():
-    env = StreetFighter()    # Original: Box (200, 256, 3) - MultiBinary(12) - Modificado (84, 84, 1)
+    pass
 
 
 if __name__ == '__main__':
-    avaliar('./save/trial_1_best_model.zip')
+    estudar_ppo()
 
