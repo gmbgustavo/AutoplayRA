@@ -12,7 +12,7 @@ from gym.spaces import MultiBinary, Box    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'SpaceInvaders-Atari2600'
+JOGO = 'Frostbite-Atari2600'
 
 
 class AtariGames(Env):
@@ -20,7 +20,7 @@ class AtariGames(Env):
     def __init__(self):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
-        self.action_space = MultiBinary(12)
+        self.action_space = MultiBinary(8)
         self.game = retro.make(game=JOGO, use_restricted_actions=retro.Actions.FILTERED)
         self.score = 0
 

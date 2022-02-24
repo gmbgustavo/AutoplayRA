@@ -7,11 +7,12 @@ pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/torch_stable
 import optuna
 import callback    # Classe personalizada. Esta na mesma pasta
 import os
-from atarigames import AtariGames
 from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
+from atarigames import AtariGames
+from streetfighter import StreetFighter
 
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
@@ -40,7 +41,7 @@ def agent_opt(trial):
         # Criar o modelo
         save_dir = os.path.join('./save', 'trial_{}_model'.format(trial.number))
         model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=0, **model_params)
-        model.learn(total_timesteps=500_000)
+        model.learn(total_timesteps=300_000)
 
         # Avaliar o modelo - O underline significa que "não vou usar essas variaveis desempacotadas"
         mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=5)    # Desempacota, mas precisamos somente de 1
@@ -55,7 +56,7 @@ def agent_opt(trial):
 
 # Apresenta um jogo de demonstração com ações aleatórias, não treina e não carrega o treinamento
 def samplegame():
-    env = AtariGames()
+    env = StreetFighter()
     done = False
     env.reset()
     while not done:
@@ -71,19 +72,17 @@ def samplegame():
 
 def estudar_ppo():
     study = optuna.create_study(direction='maximize')
-    study.optimize(agent_opt, n_trials=5, n_jobs=1)    # Mais trials para melhorar
+    study.optimize(agent_opt, n_trials=10, n_jobs=1)    # Mais trials para melhorar
     print(study.best_params)
 
 
-def train(peso):
+def train():
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     # Parâmetros obtigos pelo estudo do optuna
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1, n_steps=2944,
-                gamma=0.9676075081504855, learning_rate=4.032635382035765e-05, clip_range=0.38952897700692946,
-                gae_lambda=0.8723735222048391)
-    model.load(peso)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1,
+                n_steps=2048, gamma=0.99, learning_rate=0.000025)
     model.learn(total_timesteps=1_500_000, callback=callback)
     return None
 
@@ -102,5 +101,5 @@ def main():
 
 
 if __name__ == '__main__':
-    estudar_ppo()
+    samplegame()
 

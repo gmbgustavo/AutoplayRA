@@ -24,12 +24,16 @@ class StreetFighter(Env):
         self.game = retro.make(game=JOGO, use_restricted_actions=retro.Actions.FILTERED)
         self.score = 0
         self.vida = 176
+        self.vida_oponente = 176
+        self.vitorias = 0
 
     def reset(self, *args):
         obs = self.game.reset()
         obs = self.preprocess(obs)
         self.score = 0
         self.vida = 176
+        self.vida_oponente = 176
+        self.vitorias = 0
         return obs
 
     def step(self, action):
@@ -40,9 +44,15 @@ class StreetFighter(Env):
         self.score = info['score']    # Armazena o atual para calcular no proximo step
         # Colocando o fator vida na recompensa - Se houve decréscimo, penaliza com -100
         if info['health'] < self.vida:
-            reward -= 100
+            reward -= 200
         self.vida = info['health']
-
+        if info['enemy_health'] < self.vida_oponente:
+            reward += 150
+        self.vida_oponente = info['enemy_health']
+        # Colocando numero de rounds vencidos como fator de recompensa
+        if info['matches_won'] > self.vitorias:
+            reward += 1000
+        self.vida = info['matches_won']
         return obs, reward, done, info
 
     def render(self, mode='human'):
