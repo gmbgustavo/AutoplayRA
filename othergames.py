@@ -8,46 +8,12 @@ import retro
 import time    # Reduzir velocidade do jogo
 import numpy as np
 import cv2
-import gym
 from gym.spaces import MultiBinary, Box    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'Alleyway-GameBoy'
-SHAPE = (144, 160, 1)
-
-
-def spaceinvader_discretizer(env):
-    """
-    Discretize Retro SpaceInvaders-Atari2600 environment
-    """
-    return Discretizer(env, buttons=env.unwrapped.buttons,
-                       combos=[['RIGHT'], ['B'], ['LEFT'], ['A']])
-
-
-class Discretizer(gym.ActionWrapper):
-    """
-    Wrap a gym environment and make it use discrete actions.
-    based on https://github.com/openai/retro-baselines/blob/master/agents/sonic_util.py
-    Args:
-        buttons: ordered list of buttons, corresponding to each dimension of the MultiBinary action space
-        combos: ordered list of lists of valid button combinations
-    """
-
-    def __init__(self, env, buttons, combos):
-        super().__init__(env)
-        assert isinstance(env.action_space, gym.spaces.MultiBinary)
-        self._decode_discrete_action = []
-        for combo in combos:
-            arr = np.array([False] * env.action_space.n)
-            for button in combo:
-                arr[buttons.index(button)] = True
-            self._decode_discrete_action.append(arr)
-
-        self.action_space = gym.spaces.Discrete(len(self._decode_discrete_action))
-
-    def action(self, act):
-        return self._decode_discrete_action[act].copy()
+JOGO = 'Arkanoid-Nes'
+SHAPE = (112, 120, 3)
 
 
 class OtherGames(Env):
@@ -56,16 +22,17 @@ class OtherGames(Env):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=SHAPE, dtype=np.uint8)
         self.action_space = MultiBinary(9)
-        self.game = retro.make(game=JOGO)
-        self.unwrapped.buttons = self.game.unwrapped.buttons
-        self.button_combos = self.game.unwrapped.button_combos
+        self.game = retro.make(game=JOGO, use_restricted_actions=retro.Actions.FILTERED)
+        # self.unwrapped.buttons = self.game.unwrapped.buttons
+        # self.button_combos = self.game.unwrapped.button_combos
         self.score = 0
+        self.vidas = 3
 
     def reset(self, *args):
         obs = self.game.reset()
-        # obs = np.zeros(shape=SHAPE)
         obs = self.preprocess(obs)
         self.score = 0
+        self.vidas = 3
         return obs
 
     def step(self, action):
@@ -74,6 +41,9 @@ class OtherGames(Env):
         # Reward
         reward = info['score'] - self.score    # Pontos atuais - pontos anteriores: Ganhou pontos.
         self.score = info['score']    # Armazena o atual para calcular no proximo step
+        if info['lives'] < self.vidas:
+            reward -= 100
+        self.vidas = info['lives']
         return obs, reward, done, info
 
     def render(self, mode='human'):
@@ -93,8 +63,8 @@ class OtherGames(Env):
         :return:
         """
         gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)    # Grayscale
-        # resize = cv2.resize(gray, (210, 160), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
-        channels = np.reshape(gray, (144, 160, 1))
+        resize = cv2.resize(gray, (112, 120), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
+        channels = np.reshape(resize, (112, 120, 1))
         return channels
 
 

@@ -5,7 +5,6 @@ pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/torch_stable
 """
 
 import optuna
-import retro
 import atarigames
 import callback    # Classe personalizada. Esta na mesma pasta
 import os
@@ -13,7 +12,7 @@ from stable_baselines3 import PPO, A2C
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.atari_wrappers import AtariWrapper
+
 
 import othergames
 from othergames import OtherGames
@@ -22,11 +21,11 @@ LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save/checkpoint'
 callback = callback.TrainAndLoggingCallback(check_freq=100_000, save_path=SAVE_DIR)
-JOGO = 'SpaceInvaders-Atari2600'
-BEST = {'n_steps': 6400,
-        'gamma': 0.92,
-        'learning_rate': 2e-5,
-        }
+BEST = {'n_steps': 7360,
+        'gamma': 0.8630280002389523,
+        'learning_rate': 1.8372193458695114e-07,
+        'clip_range': 0.29868879960760225,
+        'gae_lambda': 0.8539834116047836}
 
 
 # Função para testar os hiperparametros
@@ -45,16 +44,15 @@ def agent_opt(trial):
         model_params = ppo_opt(trial)
         # Criar o ambiente
         env = OtherGames()
-        env = atarigames.spaceinvader_discretizer(env)
         env = Monitor(env, LOG_DIR)
-        env = VecFrameStack(DummyVecEnv([lambda: env]), 3, channels_order='last')
+        env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
         # Criar o modelo
         save_dir = os.path.join('./save', 'trial_{}'.format(trial.number))
         model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=0, **model_params)
-        model.learn(total_timesteps=300_000)
+        model.learn(total_timesteps=200_000)
 
         # Avaliar o modelo - O underline significa que "não vou usar essas variaveis desempacotadas"
-        mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)    # Desempacota, mas precisamos somente de 1
+        mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=5)    # Desempacota, mas precisamos somente de 1
         env.close()
         model.save(save_dir)
         return mean_reward
@@ -74,30 +72,27 @@ def estudar_ppo():
 
 def train(pesos):
     env = OtherGames()
-    env = othergames.spaceinvader_discretizer(env)
-    env = VecFrameStack(DummyVecEnv([lambda: env]), 3, channels_order='last')
+    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     # Parâmetros obtigos pelo estudo do optuna
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1)
-    if pesos is None:
-        model.load('')
-    model.learn(total_timesteps=1_000_000, callback=callback)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1, **BEST)
+    if pesos is not None:
+        model.load(pesos)
+    model.learn(total_timesteps=2_000_000, callback=callback)
     return None
 
 
 def avaliar(pesos):
     env = OtherGames()
-    env = othergames.spaceinvader_discretizer(env)
     env = Monitor(env, LOG_DIR)
-    env = VecFrameStack(DummyVecEnv([lambda: env]), 3, channels_order='last')
+    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = PPO.load(pesos)
-    mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=5)
+    mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=3)
     return [mean_reward, desvio]
 
 
 # Apresenta um jogo de demonstração com ações aleatórias, não treina e não carrega o treinamento
 def samplegame():
     env = OtherGames()
-    env = othergames.spaceinvader_discretizer(env)
     done = False
     env.reset()
     while not done:
@@ -112,9 +107,10 @@ def samplegame():
 
 
 def main():
-    # avaliar('')
-    train(1)
+    # print(avaliar('./save/checkpoint/best_model_100000.zip'))
+    train(None)
     # estudar_ppo()
+    # samplegame()
 
 
 if __name__ == '__main__':
