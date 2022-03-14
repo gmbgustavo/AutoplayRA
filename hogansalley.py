@@ -1,8 +1,13 @@
+"""
+Usar grayscale
+
+"""
+
 import pyautogui
 from PIL import Image, ImageOps
 
 
-POSICAO = (10, 60, 550, 350)
+REGIAO = (10, 60, 550, 350)
 
 GA = ImageOps.grayscale(Image.open('./opt/ha/ga.png'))
 GB = ImageOps.grayscale(Image.open('./opt/ha/gb.png'))
@@ -11,32 +16,23 @@ GC = ImageOps.grayscale(Image.open('./opt/ha/gc.png'))
 
 def main():
     while True:
-        bandido = pyautogui.locateOnScreen(GA, region=POSICAO, confidence=0.8, grayscale=True)
+        bandido = pyautogui.locateOnScreen(GA, region=REGIAO, confidence=0.8, grayscale=True)
         if bandido is not None:
-            tiro = pyautogui.center(bandido)
-            pyautogui.moveTo(tiro)
-            pyautogui.mouseDown()
+            pyautogui.mouseDown(bandido[0], bandido[1])
             pyautogui.mouseUp()
-            pyautogui.moveTo(800, 800)
-            print(f'GANG-A: {tiro}')
+            # print(f'GANG-A: {bandido}')
 
-        bandido = pyautogui.locateOnScreen(GB, region=POSICAO, confidence=0.8, grayscale=True)
-        if bandido is not None:
-            tiro = pyautogui.center(bandido)
-            pyautogui.moveTo(tiro)
-            pyautogui.mouseDown()
+        bandido2 = pyautogui.locateOnScreen(GB, region=REGIAO, confidence=0.8, grayscale=True)
+        if bandido2 is not None:
+            pyautogui.mouseDown(bandido2[0], bandido2[1])
             pyautogui.mouseUp()
-            pyautogui.moveTo(800, 800)
-            print(f'GANG-B: {tiro}')
+            # print(f'GANG-B: {bandido2}')
 
-        bandido = pyautogui.locateOnScreen(GC, region=POSICAO, confidence=0.8, grayscale=True)
-        if bandido is not None:
-            tiro = pyautogui.center(bandido)
-            pyautogui.moveTo(tiro)
-            pyautogui.mouseDown()
+        bandido3 = pyautogui.locateOnScreen(GC, region=REGIAO, confidence=0.8, grayscale=True)
+        if bandido3 is not None:
+            pyautogui.mouseDown(bandido3[0], bandido3[1])
             pyautogui.mouseUp()
-            pyautogui.moveTo(800, 800)
-            print(f'GANG-C: {tiro}')
+            # print(f'GANG-C: {bandido3}')
 
 
 if __name__ == '__main__':
