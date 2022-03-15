@@ -5,7 +5,6 @@ __pycache__/
 .idea
 logs
 save
-opt
 
 # C extensions
 *.so
