@@ -1,58 +1,105 @@
 """
-Duck Hunt autoplay.
+Wild Gunman autoplay.
 - Use grayscale
-- Use minimum confidence 0.8
+- Use minimum confidence 0.75
 - Use retroarch Fceum core
-- Use max 2x window scale on RA
+- Using 2x window in RetroAarch
 - Max up zapper tolerance (fceum core options)
 """
 
 import pyautogui
+import time
 from PIL import Image, ImageOps
 
 
-SALOON = (20, 70, 530, 320)
+GAMEMODES = ['A', 'B', 'C']
+GAMEA = (240, 220, 900, 50)    # Small area around the eyes
+GAMEBLEFT = (140, 190, 120, 120)
+GAMEBRIGHT = (350, 190, 120, 120)
+GAMEBFLIP = [14, 18, 25, 33]    # Handles some exceptions in game B
+SALOON = (30, 70, 500, 300)
 
-B1 = ImageOps.grayscale(Image.open('../opt/wg/b1.png'))
-B2 = ImageOps.grayscale(Image.open('../opt/wg/b2.png'))
-B3 = ImageOps.grayscale(Image.open('../opt/wg/b3.png'))
-B4 = ImageOps.grayscale(Image.open('../opt/wg/b4.png'))
-B5 = ImageOps.grayscale(Image.open('../opt/wg/b5.png'))
 
+def main(game: str):
+    if game not in GAMEMODES:
+        print('\nCHOOSE A GAME MODE!!!!! - A B OR C (UPPERCASE')
+        quit(1)
 
-def main():
-    while True:
-        t1 = pyautogui.locateOnScreen(B1, region=SALOON, confidence=0.85, grayscale=True)
-        if t1 is not None:
-            pyautogui.mouseDown(t1[0], t1[1])
-            pyautogui.mouseUp()
-            print(f'Target 1 down!: {t1}')
+    mendown = 0
 
-        t2 = pyautogui.locateOnScreen(B2, region=SALOON, confidence=0.85, grayscale=True)
-        if t2 is not None:
-            pyautogui.mouseDown(t2[0], t2[1])
-            pyautogui.mouseUp()
-            print(f'Target 2 down!: {t2}')
+    if game == 'C':
+        gang1 = ImageOps.grayscale(Image.open('../opt/wg/b1.png'))
+        gang2 = ImageOps.grayscale(Image.open('../opt/wg/b2.png'))
+        gang3 = ImageOps.grayscale(Image.open('../opt/wg/b3.png'))
+        gang4 = ImageOps.grayscale(Image.open('../opt/wg/b4.png'))
+        gang5 = ImageOps.grayscale(Image.open('../opt/wg/b5.png'))
+        while True:
+            t1 = pyautogui.locateOnScreen(gang1, region=SALOON, confidence=0.85, grayscale=True)
+            if t1 is not None:
+                pyautogui.mouseDown(t1[0], t1[1])
+                pyautogui.mouseUp()
+                mendown += 1
+                print(f'Gang 1 down! - Total {mendown}')
 
-        t3 = pyautogui.locateOnScreen(B3, region=SALOON, confidence=0.85, grayscale=True)
-        if t3 is not None:
-            pyautogui.mouseDown(t3[0], t3[1])
-            pyautogui.mouseUp()
-            print(f'Target 3 down!: {t3}')
+            t2 = pyautogui.locateOnScreen(gang2, region=SALOON, confidence=0.85, grayscale=True)
+            if t2 is not None:
+                pyautogui.mouseDown(t2[0], t2[1])
+                pyautogui.mouseUp()
+                mendown += 1
+                print(f'Gang 2 down! - Total {mendown}')
 
-        t4 = pyautogui.locateOnScreen(B4, region=SALOON, confidence=0.85, grayscale=True)
-        if t4 is not None:
-            pyautogui.mouseDown(t4[0], t4[1])
-            pyautogui.mouseUp()
-            print(f'Target 4 down!: {t4}')
+            t3 = pyautogui.locateOnScreen(gang3, region=SALOON, confidence=0.85, grayscale=True)
+            if t3 is not None:
+                pyautogui.mouseDown(t3[0], t3[1])
+                pyautogui.mouseUp()
+                mendown += 1
+                print(f'Gang 3 down! - Total {mendown}')
 
-        t5 = pyautogui.locateOnScreen(B5, region=SALOON, confidence=0.85, grayscale=True)
-        if t5 is not None:
-            pyautogui.mouseDown(t5[0], t5[1])
-            pyautogui.mouseUp()
-            print(f'Target 5 down!: {t5}')
+            t4 = pyautogui.locateOnScreen(gang4, region=SALOON, confidence=0.7, grayscale=True)
+            if t4 is not None:
+                pyautogui.mouseDown(t4[0] + 10, t4[1] + 10)
+                pyautogui.mouseUp()
+                mendown += 1
+                print(f'Gang 4 down! - Total {mendown}')
+
+            t5 = pyautogui.locateOnScreen(gang5, region=SALOON, confidence=0.85, grayscale=True)
+            if t5 is not None:
+                pyautogui.mouseDown(t5[0], t5[1])
+                pyautogui.mouseUp()
+                mendown += 1
+                print(f'Gang 5 down! - Total {mendown}')
+
+    elif game == 'A':
+        fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))   # Shared by every target
+        while True:
+            target = pyautogui.locateOnScreen(fire, region=GAMEA, confidence=0.85, grayscale=True)
+            if target is not None:
+                pyautogui.mouseDown(target[0], target[1])
+                pyautogui.mouseUp()
+                mendown += 1
+                print(f'Gang down! - Total {mendown}')
+                time.sleep(4)    # Prevents from shooting twice and saves a little processing
+
+    elif game == 'B':
+        level = 1
+        offset = 210
+        fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))  # Shared by every target
+        while True:
+            if level not in GAMEBFLIP:
+                target = pyautogui.locateOnScreen(fire, region=GAMEBLEFT, confidence=0.85, grayscale=True)
+            else:
+                target = pyautogui.locateOnScreen(fire, region=GAMEBRIGHT, confidence=0.85, grayscale=True)
+                offset = -abs(offset)
+            if target is not None:
+                pyautogui.mouseDown(target[0], target[1])
+                pyautogui.mouseUp()
+                pyautogui.mouseDown(target[0] + offset, target[1] - 15)
+                pyautogui.mouseUp()
+                print(f'Cleared round: {level}')
+                time.sleep(5)
+                level += 1
+                offset = abs(offset)
 
 
 if __name__ == '__main__':
-    main()
-
+    main(game='C')
