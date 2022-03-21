@@ -49,7 +49,7 @@ def agent_opt(trial):
         # Criar o modelo
         save_dir = os.path.join('./save', 'trial_{}'.format(trial.number))
         model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=0, **model_params)
-        model.learn(total_timesteps=200_000)
+        model.learn(total_timesteps=250_000)
 
         # Avaliar o modelo - O underline significa que "não vou usar essas variaveis desempacotadas"
         mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=5)    # Desempacota, mas precisamos somente de 1
@@ -73,7 +73,7 @@ def estudar_ppo():
 def train(pesos):
     env = OtherGames()
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
-    # Parâmetros obtigos pelo estudo do optuna
+    # Parâmetros obtidos pelo estudo do optuna
     model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1, **BEST)
     if pesos is not None:
         model.load(pesos)

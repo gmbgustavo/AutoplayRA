@@ -12,7 +12,7 @@ from gym.spaces import MultiBinary, Box    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'Arkanoid-Nes'
+JOGO = 'BalloonFight-Nes'
 SHAPE = (112, 120, 3)
 
 
