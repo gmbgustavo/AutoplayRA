@@ -13,10 +13,10 @@ from PIL import Image, ImageOps
 
 
 GAMEMODES = ['A', 'B', 'C']
-GAMEA = (240, 220, 900, 50)    # Small area around the eyes
+GAMEA = (270, 220, 80, 80)    # Small area around the eyes
 GAMEBLEFT = (140, 190, 120, 120)
 GAMEBRIGHT = (350, 190, 120, 120)
-GAMEBFLIP = [14, 18, 25, 33]    # Handles some exceptions in game B
+GAMEBFLIP = [8, 11, 13, 14, 16, 18, 25, 28, 31, 33, 38, 40, 41, 46, 48]    # Handles some exceptions in game B
 SALOON = (30, 70, 500, 300)
 
 
@@ -93,13 +93,13 @@ def main(game: str):
             if target is not None:
                 pyautogui.mouseDown(target[0], target[1])
                 pyautogui.mouseUp()
-                pyautogui.mouseDown(target[0] + offset, target[1] - 15)
+                pyautogui.mouseDown(target[0] + offset, target[1] - 10)
                 pyautogui.mouseUp()
                 print(f'Cleared round: {level}')
-                time.sleep(5)
+                # time.sleep(2)
                 level += 1
                 offset = abs(offset)
 
 
 if __name__ == '__main__':
-    main(game='C')
+    main(game='B')
