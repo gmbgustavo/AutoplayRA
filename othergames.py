@@ -4,15 +4,15 @@ Importação das roms python -m retro.import  ./romfolder
 Essa classe cria um jogo usando um ambiente custmoizado
 """
 
-import retro
 import time    # Reduzir velocidade do jogo
 import numpy as np
 import cv2
-from gym.spaces import MultiBinary, Box    # Wrappers
+import gym
+from gym.spaces import Discrete, Box    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'BalloonFight-Nes'
+JOGO = 'Breakout-v0'
 SHAPE = (112, 120, 3)
 
 
@@ -20,30 +20,26 @@ class OtherGames(Env):
 
     def __init__(self):
         super().__init__()
+        self.game = gym.make(JOGO)
         self.observation_space = Box(low=0, high=255, shape=SHAPE, dtype=np.uint8)
-        self.action_space = MultiBinary(9)
-        self.game = retro.make(game=JOGO, use_restricted_actions=retro.Actions.FILTERED)
-        # self.unwrapped.buttons = self.game.unwrapped.buttons
-        # self.button_combos = self.game.unwrapped.button_combos
-        self.score = 0
-        self.vidas = 3
+        self.action_space = Discrete(4)
+        self.lives = 5
+        self.reward = 0
 
     def reset(self, *args):
         obs = self.game.reset()
         obs = self.preprocess(obs)
-        self.score = 0
-        self.vidas = 3
         return obs
 
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
         # Reward
-        reward = info['score'] - self.score    # Pontos atuais - pontos anteriores: Ganhou pontos.
-        self.score = info['score']    # Armazena o atual para calcular no proximo step
-        if info['lives'] < self.vidas:
-            reward -= 100
-        self.vidas = info['lives']
+        if info['lives'] < self.lives:
+            reward -= 10
+            self.lives = info['lives']
+        else:
+            reward += 1
         return obs, reward, done, info
 
     def render(self, mode='human'):

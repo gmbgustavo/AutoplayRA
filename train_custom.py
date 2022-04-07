@@ -82,7 +82,7 @@ def train(pesos):
 
 
 def avaliar(pesos):
-    env = OtherGames()
+    env = atarigames.AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = PPO.load(pesos)
@@ -100,14 +100,13 @@ def samplegame():
         # time.sleep(0.01)
         obs, reward, done, info = env.step(env.action_space.sample())   # Ações aleatórias
         if reward != 0:
-            print(reward)
             print(info)
     env.close()
     return None
 
 
 def main():
-    # print(avaliar('./save/checkpoint/best_model_100000.zip'))
+    # print(avaliar('./save/checkpoint/p'))
     train(None)
     # estudar_ppo()
     # samplegame()

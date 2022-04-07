@@ -4,7 +4,6 @@ Importação das roms python -m retro.import  ./romfolder
 Essa classe cria um jogo usando um ambiente custmoizado
 """
 
-import retro
 import time    # Reduzir velocidade do jogo
 import numpy as np
 import cv2
