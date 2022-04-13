@@ -12,7 +12,7 @@ from gym.spaces import Discrete, Box    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'Breakout-v0'
+JOGO = 'SpaceInvaders-v0'
 SHAPE = (112, 120, 3)
 
 
@@ -23,7 +23,7 @@ class OtherGames(Env):
         self.game = gym.make(JOGO)
         self.observation_space = Box(low=0, high=255, shape=SHAPE, dtype=np.uint8)
         self.action_space = Discrete(4)
-        self.lives = 5
+        self.lives = 3
         self.reward = 0
 
     def reset(self, *args):
@@ -38,8 +38,6 @@ class OtherGames(Env):
         if info['lives'] < self.lives:
             reward -= 10
             self.lives = info['lives']
-        else:
-            reward += 1
         return obs, reward, done, info
 
     def render(self, mode='human'):

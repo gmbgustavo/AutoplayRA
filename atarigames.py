@@ -8,12 +8,11 @@ import time    # Reduzir velocidade do jogo
 import numpy as np
 import cv2
 import gym
-from gym.spaces import MultiBinary, Box    # Wrappers
+from gym.spaces import MultiBinary, Box, Discrete    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'SpaceInvaders-Atari2600'
-
+JOGO = 'SpaceInvaders-v0'
 
 
 class AtariGames(Env):
@@ -21,12 +20,9 @@ class AtariGames(Env):
     def __init__(self):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(210, 160, 1), dtype=np.uint8)
-        self.action_space = MultiBinary(8)
-        self.game = gym.make(JOGO)
-        self.unwrapped.buttons = self.game.unwrapped.buttons
-        self.button_combos = self.game.unwrapped.button_combos
+        self.action_space = Discrete(4)
+        self.game = gym.make(JOGO, render_mode=None)
         self.vidas = 3
-        self.height = 82
         self.score = 0
 
     def reset(self, *args):
@@ -34,21 +30,16 @@ class AtariGames(Env):
         obs = self.preprocess(obs)
         self.score = 0
         self.vidas = 3
-        self.height = 82
         return obs
 
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
         # Reward
-        reward = info['scoreLo'] - self.score    # Pontos atuais - pontos anteriores: Ganhou pontos.
-        self.score = info['scoreLo']    # Armazena o atual para calcular no proximo step
         if info['lives'] < self.vidas:
-            reward -= 10
+            reward -= 20
             self.vidas = info['lives']
-        if info['height'] < self.height:
-            reward -= 5
-            self.vidas = info['height']
+        reward = reward + info['episode_frame_number'] // 1000
         return obs, reward, done, info
 
     def render(self, mode='human'):

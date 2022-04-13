@@ -5,17 +5,14 @@ pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/torch_stable
 """
 
 import optuna
-import atarigames
 import callback    # Classe personalizada. Esta na mesma pasta
 import os
+from atarigames import AtariGames
 from stable_baselines3 import PPO, A2C
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
 
-
-import othergames
-from othergames import OtherGames
 
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
@@ -43,7 +40,7 @@ def agent_opt(trial):
     try:
         model_params = ppo_opt(trial)
         # Criar o ambiente
-        env = OtherGames()
+        env = AtariGames()
         env = Monitor(env, LOG_DIR)
         env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
         # Criar o modelo
@@ -71,7 +68,7 @@ def estudar_ppo():
 
 
 def train(pesos):
-    env = OtherGames()
+    env = AtariGames()
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     # Parâmetros obtidos pelo estudo do optuna
     model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1, **BEST)
@@ -82,7 +79,7 @@ def train(pesos):
 
 
 def avaliar(pesos):
-    env = atarigames.AtariGames()
+    env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = PPO.load(pesos)
@@ -92,24 +89,25 @@ def avaliar(pesos):
 
 # Apresenta um jogo de demonstração com ações aleatórias, não treina e não carrega o treinamento
 def samplegame():
-    env = OtherGames()
+    env = AtariGames()
     done = False
     env.reset()
     while not done:
-        env.render()
+        env.render(mode='human')
         # time.sleep(0.01)
         obs, reward, done, info = env.step(env.action_space.sample())   # Ações aleatórias
         if reward != 0:
             print(info)
+            print(reward)
     env.close()
     return None
 
 
 def main():
     # print(avaliar('./save/checkpoint/p'))
-    train(None)
+    # train(None)
     # estudar_ppo()
-    # samplegame()
+    samplegame()
 
 
 if __name__ == '__main__':
