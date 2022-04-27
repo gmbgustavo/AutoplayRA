@@ -7,6 +7,7 @@ pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/torch_stable
 import optuna
 import callback    # Classe personalizada. Esta na mesma pasta
 import os
+import gym
 from atarigames import AtariGames
 from stable_baselines3 import PPO, A2C
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -17,12 +18,13 @@ from stable_baselines3.common.monitor import Monitor
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save/checkpoint'
-callback = callback.TrainAndLoggingCallback(check_freq=100_000, save_path=SAVE_DIR)
+callback = callback.TrainAndLoggingCallback(check_freq=250_000, save_path=SAVE_DIR)
 BEST = {'n_steps': 7360,
         'gamma': 0.8630280002389523,
         'learning_rate': 1.8372193458695114e-07,
         'clip_range': 0.29868879960760225,
         'gae_lambda': 0.8539834116047836}
+JOGO = 'SpaceInvaders-v0'
 
 
 # Função para testar os hiperparametros
@@ -67,8 +69,9 @@ def estudar_ppo():
         f.close()
 
 
-def train(pesos):
+def train(pesos=None):
     env = AtariGames()
+    env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     # Parâmetros obtidos pelo estudo do optuna
     model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, device='cuda', verbose=1, **BEST)
@@ -78,12 +81,12 @@ def train(pesos):
     return None
 
 
-def avaliar(pesos):
+def avaliar(pesos=None):
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = PPO.load(pesos)
-    mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=3)
+    mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=5)
     return [mean_reward, desvio]
 
 
@@ -93,7 +96,7 @@ def samplegame():
     done = False
     env.reset()
     while not done:
-        env.render(mode='human')
+        env.render(mode='rgb_array')
         # time.sleep(0.01)
         obs, reward, done, info = env.step(env.action_space.sample())   # Ações aleatórias
         if reward != 0:
@@ -104,8 +107,8 @@ def samplegame():
 
 
 def main():
-    # print(avaliar('./save/checkpoint/p'))
-    # train(None)
+    # print(avaliar('./save/checkpoint/best_model_'))
+    # train()
     # estudar_ppo()
     samplegame()
 

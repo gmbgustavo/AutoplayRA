@@ -8,11 +8,11 @@ import time    # Reduzir velocidade do jogo
 import numpy as np
 import cv2
 import gym
-from gym.spaces import MultiBinary, Box, Discrete    # Wrappers
+from gym.spaces import Box, Discrete    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'SpaceInvaders-v0'
+JOGO = 'ALE/SpaceInvaders-v5'
 
 
 class AtariGames(Env):
@@ -21,7 +21,14 @@ class AtariGames(Env):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(210, 160, 1), dtype=np.uint8)
         self.action_space = Discrete(4)
-        self.game = gym.make(JOGO, render_mode=None)
+        self.game = gym.make(JOGO,
+                             obs_type='grayscale',    # ram | rgb | grayscale
+                             frameskip=2,    # frame skip
+                             mode=0,    # game mode, see Machado et al. 2018
+                             difficulty=0,    # game difficulty, see Machado et al. 2018
+                             repeat_action_probability=0.20,    # Sticky action probability
+                             full_action_space=True,    # Use all actions
+                             render_mode='rgb_array')    # None | human | rgb_array
         self.vidas = 3
         self.score = 0
 
@@ -35,11 +42,11 @@ class AtariGames(Env):
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
-        # Reward
+        self.score = info['score'] - self.score
+        self.score = info['score']
         if info['lives'] < self.vidas:
-            reward -= 20
+            reward -= 1000
             self.vidas = info['lives']
-        reward = reward + info['episode_frame_number'] // 1000
         return obs, reward, done, info
 
     def render(self, mode='human'):
@@ -58,12 +65,11 @@ class AtariGames(Env):
         Mudar a função de recompensa: otimizar o aprendizado.
         :return:
         """
-        gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)    # Grayscale
-        # resize = cv2.resize(gray, (210, 160), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
-        channels = np.reshape(gray, (210, 160, 1))
+        # gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)    # Grayscale - já aplicado na instância do gym
+        resize = cv2.resize(observation, (210, 160), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
+        channels = np.reshape(resize, (210, 160, 1))
         return channels
 
 
 if __name__ == '__main__':
     print('\nEssa classe deve ser importada e não executada diretamente.')
-
