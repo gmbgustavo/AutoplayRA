@@ -50,7 +50,7 @@ class BalloonTripEnvironment:
 
     def is_game_over(self):
         img = ImageGrab.grab(bbox=self._region)
-        img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         res = cv2.matchTemplate(img, self._doneimage, eval('cv2.TM_CCOEFF_NORMED'))
         return (res >= 0.8).any()
 
