@@ -27,7 +27,7 @@ def train(pesos=None):
                 learning_rate=0.0002, buffer_size=32, tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
         model.load(pesos)
-    model.learn(total_timesteps=5_000_000, callback=callback)
+    model.learn(total_timesteps=100_000, callback=callback)
     return None
 
 
@@ -56,8 +56,8 @@ def samplegame():
 
 
 def main():
-    # print(avaliar('./save/best_model_'))
-    train(pesos='./save/best_model_000000.zip')
+    # print(avaliar('./save/best_model_5000000.zip'))
+    train(pesos='./save/best_model_5000000.zip')
     # samplegame()
 
 

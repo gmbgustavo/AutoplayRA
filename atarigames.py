@@ -19,11 +19,11 @@ class AtariGames(Env):
 
     def __init__(self, mode=None):
         super().__init__()
-        self.observation_space = Box(low=0, high=255, shape=(105, 80, 1), dtype=np.uint8)
-        self.action_space = Discrete(18)
+        self.observation_space = Box(low=0, high=255, shape=(210, 160, 1), dtype=np.uint8)
+        self.action_space = Discrete(6)
         self.game = gym.make(JOGO,
                              obs_type='grayscale',    # ram | rgb | grayscale
-                             frameskip=2,    # frame skip
+                             frameskip=3,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
                              repeat_action_probability=0.25,    # Sticky action probability
@@ -40,6 +40,7 @@ class AtariGames(Env):
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
+        reward = reward * 2
         if info['lives'] < self.vidas:
             reward -= 50
             self.vidas = info['lives']
@@ -62,8 +63,8 @@ class AtariGames(Env):
         :return:
         """
         # gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)    # Grayscale - já aplicado na instância do gym
-        resize = cv2.resize(observation, (105, 80), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
-        channels = np.reshape(resize, (105, 80, 1))
+        resize = cv2.resize(observation, (210, 160), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
+        channels = np.reshape(resize, (210, 160, 1))
         return channels
 
 
