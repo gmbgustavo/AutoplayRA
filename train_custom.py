@@ -23,10 +23,11 @@ def train(pesos=None):
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
-    model = DQN('CnnPolicy', env, exploration_fraction=0.25, tensorboard_log=LOG_DIR, device='cuda', verbose=1)
+    model = DQN('CnnPolicy', env, exploration_fraction=0.33, optimize_memory_usage=True, gamma=0.988,
+                learning_rate=0.0002, buffer_size=32, tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
         model.load(pesos)
-    model.learn(total_timesteps=2_000_000, callback=callback)
+    model.learn(total_timesteps=5_000_000, callback=callback)
     return None
 
 
@@ -56,7 +57,7 @@ def samplegame():
 
 def main():
     # print(avaliar('./save/best_model_'))
-    train()
+    train(pesos='./save/best_model_000000.zip')
     # samplegame()
 
 

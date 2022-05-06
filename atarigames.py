@@ -26,7 +26,7 @@ class AtariGames(Env):
                              frameskip=2,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
-                             repeat_action_probability=0.2,    # Sticky action probability
+                             repeat_action_probability=0.25,    # Sticky action probability
                              full_action_space=True,    # Use all actions
                              render_mode=mode)    # None | human | rgb_array
         self.vidas = 3
