@@ -14,16 +14,16 @@ from stable_baselines3.common.monitor import Monitor
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save'
-callback = callback.TrainAndLoggingCallback(check_freq=250_000, save_path=SAVE_DIR)
+callback = callback.TrainAndLoggingCallback(check_freq=500_000, save_path=SAVE_DIR)
 
 
 def train(pesos=None):
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
-    env = VecFrameStack(DummyVecEnv([lambda: env]), 3, channels_order='last')
-    model = DQN('CnnPolicy', env, exploration_fraction=0.1, optimize_memory_usage=True,
-                learning_rate=0.00002, buffer_size=32,
-                gamma=0.987, exploration_initial_eps=0.99, exploration_final_eps=0.15,
+    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
+    model = DQN('CnnPolicy', env, exploration_fraction=0.7, optimize_memory_usage=True,
+                learning_rate=0.00003, buffer_size=24,
+                gamma=0.99, exploration_initial_eps=1.0, exploration_final_eps=0.15,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
         model.load(pesos)
@@ -34,7 +34,7 @@ def train(pesos=None):
 def avaliar(pesos=None):
     env = AtariGames(mode='human')
     env = Monitor(env, LOG_DIR)
-    env = VecFrameStack(DummyVecEnv([lambda: env]), 3, channels_order='last')
+    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = DQN.load(pesos)
     mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=2)
     return [mean_reward, desvio]
@@ -56,8 +56,8 @@ def samplegame():
 
 
 def main():
-    print(avaliar('./save/best_model_000000.zip'))
-    # train(pesos=None)
+    # print(avaliar('./save/model_000000.zip'))
+    train(pesos='./save/best_model_1000000.zip')
     # samplegame()
 
 
