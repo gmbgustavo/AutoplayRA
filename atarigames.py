@@ -23,31 +23,33 @@ class AtariGames(Env):
         self.action_space = Discrete(6)
         self.game = gym.make(JOGO,
                              obs_type='grayscale',    # ram | rgb | grayscale
-                             frameskip=1,    # frame skip
+                             frameskip=4,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
                              repeat_action_probability=0.25,    # Sticky action probability
                              full_action_space=False,    # Use all actions or just the useful ones(False)
                              render_mode=mode)    # None | human | rgb_array
         self.vidas = 3
-        self.total_reward = 0
+        self.total_score = 0
 
     def reset(self, *args):
         obs = self.game.reset()
         obs = self.preprocess(obs)
         self.vidas = 3
+        self.total_score = 0
         return obs
 
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
+        info['total_score'] = self.total_score
         if info['lives'] < self.vidas:
-            reward -= 50
+            reward -= 100
             self.vidas = info['lives']
-        reward += info['episode_frame_number'] // 1000
-        if reward < 0:
-            reward = -1
-        self.total_reward += reward
+        if reward > 0:
+            self.total_score += reward
+        if info['episode_frame_number'] > 2000:
+            reward += info['episode_frame_number'] // 500
         return obs, reward, done, info
 
     def render(self, mode=None):
