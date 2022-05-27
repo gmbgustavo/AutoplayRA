@@ -3,7 +3,6 @@ Dependencias: gym, gym-retro
 Importação das roms python -m retro.import  ./romfolder
 Essa classe cria um jogo usando um ambiente custmoizado
 """
-from abc import ABC
 
 import numpy as np
 import cv2
@@ -23,7 +22,7 @@ class AtariGames(Env):
         self.action_space = Discrete(6)
         self.game = gym.make(JOGO,
                              obs_type='grayscale',    # ram | rgb | grayscale
-                             frameskip=4,    # frame skip
+                             frameskip=2,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
                              repeat_action_probability=0.25,    # Sticky action probability
@@ -44,12 +43,10 @@ class AtariGames(Env):
         obs = self.preprocess(obs)
         info['total_score'] = self.total_score
         if info['lives'] < self.vidas:
-            reward -= 100
+            reward -= 150
             self.vidas = info['lives']
-        if reward > 0:
-            self.total_score += reward
         if info['episode_frame_number'] > 2000:
-            reward += info['episode_frame_number'] // 500
+            reward += info['episode_frame_number'] // 1000
         return obs, reward, done, info
 
     def render(self, mode=None):

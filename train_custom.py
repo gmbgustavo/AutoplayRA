@@ -1,7 +1,6 @@
 """
 Treinamento da classe do ambiente gym customizado
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
-
 """
 
 import callback    # Classe personalizada. Esta na mesma pasta
@@ -23,11 +22,11 @@ def train(pesos=None):
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = DQN('MlpPolicy', env, exploration_fraction=0.7, optimize_memory_usage=True,
                 learning_rate=0.00002, buffer_size=32,
-                gamma=0.98, exploration_initial_eps=1.0, exploration_final_eps=0.15,
+                gamma=0.98, exploration_initial_eps=1.0, exploration_final_eps=0.12,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
         model.load(pesos)
-    model.learn(total_timesteps=10_000_000, callback=callback)
+    model.learn(total_timesteps=20_000_000, callback=callback)
     return None
 
 
@@ -56,8 +55,8 @@ def samplegame():
 
 
 def main():
-    # print(avaliar('./save/model_000000.zip'))
-    train(pesos='./save/model_500000')
+    # print(avaliar('./save/model_12000000.zip'))
+    train(pesos='./save/model_12000000.zip')
     # samplegame()
 
 
