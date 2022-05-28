@@ -13,16 +13,16 @@ from stable_baselines3.common.monitor import Monitor
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save'
-callback = callback.TrainAndLoggingCallback(check_freq=500_000, save_path=SAVE_DIR)
+callback = callback.TrainAndLoggingCallback(check_freq=1_000_000, save_path=SAVE_DIR)
 
 
 def train(pesos=None):
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
-    model = DQN('MlpPolicy', env, exploration_fraction=0.7, optimize_memory_usage=True,
-                learning_rate=0.00002, buffer_size=32,
-                gamma=0.98, exploration_initial_eps=1.0, exploration_final_eps=0.12,
+    model = DQN('MlpPolicy', env, exploration_fraction=0.75, optimize_memory_usage=True,
+                learning_rate=0.001, buffer_size=32,
+                gamma=0.98, exploration_initial_eps=1.0, exploration_final_eps=0.05,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
         model.load(pesos)
@@ -55,8 +55,8 @@ def samplegame():
 
 
 def main():
-    # print(avaliar('./save/model_12000000.zip'))
-    train(pesos='./save/model_12000000.zip')
+    # print(avaliar('./save/model_000000.zip'))
+    train(pesos='./save/model_20000000.zip')
     # samplegame()
 
 
