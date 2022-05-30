@@ -19,10 +19,10 @@ class AtariGames(Env):
     def __init__(self, mode=None):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(105, 80, 1), dtype=np.uint8)
-        self.action_space = Discrete(5)
+        self.action_space = Discrete(6)
         self.game = gym.make(JOGO,
                              obs_type='grayscale',    # ram | rgb | grayscale
-                             frameskip=2,    # frame skip
+                             frameskip=1,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
                              repeat_action_probability=0.25,    # Sticky action probability
@@ -42,9 +42,9 @@ class AtariGames(Env):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
         info['total_score'] = self.total_score
-        reward += reward * 1.5
+        reward += reward * 3
         if info['lives'] < self.vidas:
-            reward -= 150
+            reward -= 500
             self.vidas = info['lives']
         if info['episode_frame_number'] % 2 == 0:
             reward += info['episode_frame_number'] // 1000
