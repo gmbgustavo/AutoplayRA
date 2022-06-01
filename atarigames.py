@@ -9,6 +9,7 @@ import cv2
 import gym
 from gym.spaces import Box, Discrete    # Wrappers
 from gym import Env    # Clase ambiente básica
+from stable_baselines3.common.env_util import make_atari_env
 
 
 JOGO = 'ALE/SpaceInvaders-v5'
@@ -43,11 +44,18 @@ class AtariGames(Env):
         obs = self.preprocess(obs)
         self.total_score = reward
         info['total_score'] = self.total_score
-        reward += reward * 3
+        if info['episode_frame_number'] > 1000:
+            reward += reward * 1.5
+        elif info['episode_frame_number'] > 2000:
+            reward += reward * 2
+        elif info['episode_frame_number'] > 3000:
+            reward += reward * 3
+        elif info['episode_frame_number'] > 5000:
+            reward += reward * 5
+
         if info['lives'] < self.vidas:
             reward -= 2000
             self.vidas = info['lives']
-        reward += info['episode_frame_number'] // 200
         return obs, reward, done, info
 
     def render(self, mode=None):
