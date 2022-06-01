@@ -45,9 +45,8 @@ class AtariGames(Env):
         info['total_score'] = self.total_score
         reward += reward * 3
         if info['lives'] < self.vidas:
-            reward -= 2000
+            reward -= 1000
             self.vidas = info['lives']
-        reward += info['episode_frame_number'] // 200
         return obs, reward, done, info
 
     def render(self, mode=None):
