@@ -47,6 +47,9 @@ class AtariGames(Env):
         if info['lives'] < self.vidas:
             reward -= 1000
             self.vidas = info['lives']
+        if done:
+            obs = self.reset()
+
         return obs, reward, done, info
 
     def render(self, mode=None):
