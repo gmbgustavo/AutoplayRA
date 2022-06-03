@@ -6,8 +6,6 @@ pip3 install torch torchvision torchaudio --extra-index-url https://download.pyt
 import callback    # Classe personalizada. Esta na mesma pasta
 from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
-from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.env_util import make_atari_env
 
 LOG_DIR = './logs'
