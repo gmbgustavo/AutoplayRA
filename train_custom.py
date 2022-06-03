@@ -9,17 +9,18 @@ from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.env_util import make_atari_env
 
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save'
+JOGO = 'ALE/SpaceInvaders-v5'
+
 callback = callback.TrainAndLoggingCallback(check_freq=1_000_000, save_path=SAVE_DIR)
 
 
 def train(pesos=None):
-    env = AtariGames()
-    env = Monitor(env, LOG_DIR)
-    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
+    env = make_atari_env(JOGO, n_envs=1)
     model = DQN('CnnPolicy', env, exploration_fraction=0.70, optimize_memory_usage=True,
                 learning_rate=0.0099, buffer_size=32,
                 gamma=0.98, exploration_initial_eps=0.99, exploration_final_eps=0.15,
@@ -31,9 +32,7 @@ def train(pesos=None):
 
 
 def avaliar(pesos=None):
-    env = AtariGames(mode='human')
-    env = Monitor(env, LOG_DIR)
-    env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
+    env = make_atari_env(JOGO, n_envs=1)
     model = DQN.load(pesos)
     mean_reward, desvio = evaluate_policy(model, env, render=True, n_eval_episodes=2)
     return [mean_reward, desvio]
@@ -41,7 +40,7 @@ def avaliar(pesos=None):
 
 # Apresenta um jogo de demonstração com ações aleatórias, não treina e não carrega o treinamento
 def samplegame():
-    env = AtariGames(mode='human')
+    env = make_atari_env(JOGO, n_envs=1)
     done = False
     env.reset()
     while not done:
