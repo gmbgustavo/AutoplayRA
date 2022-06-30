@@ -12,7 +12,7 @@ The inputs are keyboard strikes done with pydirectinput
 
 import pydirectinput    # Send commands
 import numpy as np
-import pytesseract
+import pyautogui
 import time
 import cv2
 from mss import mss    # Get screenshots
@@ -73,7 +73,7 @@ class ScreenGame(Env):
         end = self.cap.grab(self.done_location)
         # Primeiramente usaremos OCR para detectar o game over, pode ser feito com uma imagem pré programada
         done_strings = ['GAME', 'GAHE', '6AME', '6AHE']
-        res = pytesseract.image_to_string(end)[:4]    # Só os 4 primeiros caracteres
+        res = pyautogui.locateOnScreen('./resources/gameover.jpg')
         if res in done_strings:
             done = True
         return done
