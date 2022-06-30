@@ -18,6 +18,8 @@ import cv2
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
+from callback import TrainAndLoggingCallback
+from stable_baselines3.common import env_checker
 
 
 class ScreenGame(Env):
@@ -84,15 +86,15 @@ class ScreenGame(Env):
     def samplegame(self, episodes):
         for episode in range(episodes):
             obs = self.reset()
-            done = False
             total_reward = 0
+            done = False
             while not done:
                 obs, reward, done, info = env.step(env.action_space.sample())
                 total_reward += reward
-            print(f'Total reward for episode {episode} is {total_reward}')
+            print(f'Total reward for episode {episode} is {total_reward}.')
 
 
 if __name__ == "__main__":
-    time.sleep(1)
+    time.sleep(2)
     env = ScreenGame()
-    env.reset()
+    env_checker.check_env(env)
