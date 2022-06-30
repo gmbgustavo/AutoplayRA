@@ -18,7 +18,6 @@ import cv2
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
-from PIL import ImageOps, Image
 
 
 class ScreenGame(Env):
@@ -32,7 +31,7 @@ class ScreenGame(Env):
         self.frame = 0
         self.game_location = {'top': 300, 'left': 0, 'width': 600, 'height': 500}
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
-        self.done_location = {'top': 405, 'left': 630, 'width': 660, 'height': 70}
+        self.done_location = (637, 376, 302, 87)    # top, left, width, height
         self.action_map = {
             0: 'space',   # Jump
             1: 'down',    # Duck
@@ -48,7 +47,7 @@ class ScreenGame(Env):
         new_obs = self.get_observation()
         reward = 1    # Um ponto para cada frame
         self.frame += 1
-        info = {'frame': self.frame}
+        info = {'frame': self.frame, 'reward': reward}
         return new_obs, reward, done, info
 
     def render(self, mode="human"):
@@ -71,9 +70,10 @@ class ScreenGame(Env):
 
     def get_done(self):
         done = False
-        end = self.cap.grab(self.done_location)
-        go = ImageOps.grayscale(Image.open('./resources/gameover.jpg'))
-        res = pyautogui.locateOnScreen(go, region=(637, 376), confidence=0.7, grayscale=True)
+        res = pyautogui.locateOnScreen('./resources/gameover.jpg',
+                                       region=self.done_location,
+                                       confidence=0.75,
+                                       grayscale=True)
         if res is not None:
             done = True
         return done
@@ -81,8 +81,18 @@ class ScreenGame(Env):
     def close(self):
         pass
 
+    def samplegame(self, episodes):
+        for episode in range(episodes):
+            obs = self.reset()
+            done = False
+            total_reward = 0
+            while not done:
+                obs, reward, done, info = env.step(env.action_space.sample())
+                total_reward += reward
+            print(f'Total reward for episode {episode} is {total_reward}')
+
 
 if __name__ == "__main__":
     time.sleep(1)
     env = ScreenGame()
-    print(env.get_done())
+    env.reset()
