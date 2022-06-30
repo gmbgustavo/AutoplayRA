@@ -71,10 +71,9 @@ class ScreenGame(Env):
     def get_done(self):
         done = False
         end = self.cap.grab(self.done_location)
-        # Primeiramente usaremos OCR para detectar o game over, pode ser feito com uma imagem pré programada
-        done_strings = ['GAME', 'GAHE', '6AME', '6AHE']
-        res = pyautogui.locateOnScreen('./resources/gameover.jpg')
-        if res in done_strings:
+        res = pyautogui.locateOnScreen('./resources/gameover.jpg',
+                                       region=self.done_location, confidence=0.7, grayscale=True)
+        if res is not None:
             done = True
         return done
 
@@ -84,4 +83,4 @@ class ScreenGame(Env):
 
 if __name__ == "__main__":
     env = ScreenGame()
-    env.action_space.sample()
+    print(env.get_done())
