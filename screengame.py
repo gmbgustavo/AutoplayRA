@@ -97,4 +97,4 @@ class ScreenGame(Env):
 if __name__ == "__main__":
     time.sleep(2)
     env = ScreenGame()
-    env_checker.check_env(env)
+
