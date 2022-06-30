@@ -18,6 +18,7 @@ import cv2
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
+from PIL import ImageOps, Image
 
 
 class ScreenGame(Env):
@@ -71,8 +72,8 @@ class ScreenGame(Env):
     def get_done(self):
         done = False
         end = self.cap.grab(self.done_location)
-        res = pyautogui.locateOnScreen('./resources/gameover.jpg',
-                                       region=self.done_location, confidence=0.7, grayscale=True)
+        go = ImageOps.grayscale(Image.open('./resources/gameover.jpg'))
+        res = pyautogui.locateOnScreen(go, region=(637, 376), confidence=0.7, grayscale=True)
         if res is not None:
             done = True
         return done
@@ -82,5 +83,6 @@ class ScreenGame(Env):
 
 
 if __name__ == "__main__":
+    time.sleep(1)
     env = ScreenGame()
     print(env.get_done())
