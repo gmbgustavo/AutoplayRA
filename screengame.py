@@ -31,10 +31,19 @@ class ScreenGame(Env):
         self.game_location = {'top': 300, 'left': 0, 'width': 600, 'height': 500}
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
         self.done_location = {'top': 405, 'left': 630, 'width': 660, 'height': 70}
+        self.action_map = {
+            0: 'space',   # Jump
+            1: 'down',    # Duck
+            2: 'noop',    # Nothing
+        }
 
     def step(self, action):    # Step é como passamos as ações para o jogo
         # 0 - Jump. 1 - Duck. 2 - No op.
-        pass
+        if action != 2:
+            pydirectinput.press(self.action_map[action])
+        # Check if done
+        done = self.get_done()
+
 
     def render(self, mode="human"):
         pass
@@ -52,7 +61,14 @@ class ScreenGame(Env):
         return observation
 
     def get_done(self):
-        pass
+        done = False
+        end = self.cap.grab(self.done_location)
+        # Primeiramente usaremos OCR para detectar o game over, pode ser feito com uma imagem pré programada
+        done_strings = ['GAME', 'GAHE', '6AME', '6AHE']
+        res = pytesseract.image_to_string(end)[:4]    # Só os 4 primeiros caracteres
+        if res in done_strings:
+            done = True
+        return done
 
     def close(self):
         pass
