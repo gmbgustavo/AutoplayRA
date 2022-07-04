@@ -18,7 +18,6 @@ import cv2
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
-from callback import TrainAndLoggingCallback
 from stable_baselines3 import DQN
 
 
@@ -84,6 +83,7 @@ class ScreenGame(Env):
         pass
 
     def samplegame(self, episodes):
+        env = ScreenGame()
         for episode in range(episodes):
             obs = self.reset()
             total_reward = 0
@@ -95,26 +95,7 @@ class ScreenGame(Env):
 
 
 if __name__ == "__main__":
-    time.sleep(2)
-    env = ScreenGame()
-    savepoint = TrainAndLoggingCallback(check_freq=1000, save_path='./save')
-
-    model = DQN('CnnPolicy', env, tensorboard_log='./logs', verbose=1, buffer_size=800_000,
-                learning_starts=1000)
-    model.learn(total_timesteps=5000, callback=savepoint)
-
-    # Fazendo jogar com o modelo salvo
-    for episode in range(1):
-        obs = env.reset()
-        total_reward = 0
-        done = False
-        while not done:
-            action, _ = model.predict(obs)
-            obs, reward, done, info = env.step(int(action))
-            time.sleep(0.01)
-            total_reward += reward
-        print(f'Total reward for episode {episode} is {total_reward}.')
-        time.sleep(2)
+    print('Essa classe não deve ser executada diretamente.')
 
 
 
