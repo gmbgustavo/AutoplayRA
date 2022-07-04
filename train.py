@@ -44,6 +44,18 @@ def jogar(modelo: str):
         time.sleep(2)
 
 
+def samplegame(episodes):
+    env = ScreenGame()
+    _ = env.reset()
+    for episode in range(episodes):
+        total_reward = 0
+        done = False
+        while not done:
+            obs, reward, done, info = env.step(env.action_space.sample())
+            total_reward += reward
+        print(f'Total reward for episode {episode} is {total_reward}.')
+
+
 def main():
     jogar('./save/model_000000.zip')
     train(pesos=None)
