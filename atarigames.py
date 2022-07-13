@@ -11,7 +11,7 @@ from gym.spaces import Box, Discrete    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'ALE/SpaceInvaders-v5'
+JOGO = 'SpaceInvaders-v4'
 
 
 class AtariGames(Env):
@@ -45,11 +45,10 @@ class AtariGames(Env):
         info['total_score'] = self.total_score
         reward += reward * 3
         if info['lives'] < self.vidas:
-            reward -= 1000
+            reward = -1
             self.vidas = info['lives']
         if done:
-            obs = self.reset()
-
+            print(info)
         return obs, reward, done, info
 
     def render(self, mode=None):

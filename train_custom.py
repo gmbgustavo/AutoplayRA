@@ -20,8 +20,8 @@ def train(pesos=None):
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
-    model = DQN('CnnPolicy', env, exploration_fraction=0.70, optimize_memory_usage=True,
-                learning_rate=0.0099, buffer_size=500_000,
+    model = DQN('CnnPolicy', env, exploration_fraction=0.70, optimize_memory_usage=False,
+                learning_rate=0.00999, buffer_size=250_000,
                 gamma=0.98, exploration_initial_eps=0.99, exploration_final_eps=0.15,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
