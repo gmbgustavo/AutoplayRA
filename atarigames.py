@@ -25,7 +25,7 @@ class AtariGames(Env):
                              frameskip=1,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
-                             repeat_action_probability=0.20,    # Sticky action probability
+                             repeat_action_probability=0.15,    # Sticky action probability
                              full_action_space=False,    # Use all actions or just the useful ones(False)
                              render_mode=mode)    # None | human | rgb_array
         self.vidas = 3
@@ -41,14 +41,10 @@ class AtariGames(Env):
     def step(self, action):
         obs, reward, done, info = self.game.step(action)
         obs = self.preprocess(obs)
-        self.total_score = reward
+        self.total_score += reward
         info['total_score'] = self.total_score
-        reward += reward * 3
         if info['lives'] < self.vidas:
-            reward = -1
             self.vidas = info['lives']
-        if done:
-            print(info)
         return obs, reward, done, info
 
     def render(self, mode=None):
