@@ -11,7 +11,7 @@ from gym.spaces import Box, Discrete    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'SpaceInvaders-v4'
+JOGO = 'ALE/SpaceInvaders-v5'
 
 
 class AtariGames(Env):
@@ -20,6 +20,7 @@ class AtariGames(Env):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(105, 80, 1), dtype=np.uint8)
         self.action_space = Discrete(6)
+        a = gym.envs.register
         self.game = gym.make(JOGO,
                              obs_type='grayscale',    # ram | rgb | grayscale
                              frameskip=1,    # frame skip
@@ -27,7 +28,9 @@ class AtariGames(Env):
                              difficulty=0,    # game difficulty, see Machado et al. 2018
                              repeat_action_probability=0.15,    # Sticky action probability
                              full_action_space=False,    # Use all actions or just the useful ones(False)
-                             render_mode=mode)    # None | human | rgb_array
+                             render_mode=mode,     # None | human | rgb_array
+                             max_episode_steps=1000,
+                             autoreset=True)
         self.vidas = 3
         self.total_score = 0
 
@@ -44,7 +47,12 @@ class AtariGames(Env):
         self.total_score += reward
         info['total_score'] = self.total_score
         if info['lives'] < self.vidas:
+            reward -= 10
             self.vidas = info['lives']
+        if info['lives'] == 0:
+            done = True
+        else:
+            done = False
         return obs, reward, done, info
 
     def render(self, mode=None):
