@@ -21,12 +21,12 @@ def train(pesos=None):
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), 4, channels_order='last')
     model = DQN('CnnPolicy', env, exploration_fraction=0.75, optimize_memory_usage=True,
-                learning_rate=0.00999, buffer_size=500_000,
+                learning_rate=0.00999, buffer_size=200_000,
                 gamma=0.98, exploration_initial_eps=0.99, exploration_final_eps=0.15,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1)
     if pesos is not None:
         model.load(pesos)
-    model.learn(total_timesteps=30_000_000, callback=callback)
+    model.learn(total_timesteps=3_000_000, callback=callback)
     return None
 
 
@@ -55,7 +55,7 @@ def samplegame():
 
 
 def main():
-    # print(avaliar('./save/model_000000.zip'))
+    # print(avaliar('./save/model_'))
     train(pesos=None)
     # samplegame()
 
