@@ -26,7 +26,7 @@ class ScreenGame(Env):
     def __init__(self):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(1, 83, 100), dtype=np.uint8)
-        self.action_space = Discrete(3)    # Jump, get down, noop
+        self.action_space = Discrete(3)    # Up, down, noop
         self.cap = mss()    # Instancia a função de screenshot
         # Coordenadas do jogo, o espaço de observação.
         self.frame = 0
@@ -34,13 +34,13 @@ class ScreenGame(Env):
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
         self.done_location = (637, 376, 302, 87)    # top, left, width, height
         self.action_map = {
-            0: 'space',   # Jump
-            1: 'down',    # Duck
+            0: 'arrow_up',   # sobe
+            1: 'arrow_down',    # desce
             2: 'noop',    # Nothing
         }
 
     def step(self, action):    # Step é como passamos as ações para o jogo
-        # 0 - Jump. 1 - Duck. 2 - No op.
+        # 0 - UP . 1 - DOWN . 2 - NOOP
         if action != 2:
             pydirectinput.press(self.action_map[action])    # Ação será passada pelo treinamento
         # Check if done
@@ -55,9 +55,9 @@ class ScreenGame(Env):
         pass
 
     def reset(self, *args):
-        time.sleep(0.01)
-        pydirectinput.click(x=150, y=150)
-        pydirectinput.press('space')
+        time.sleep(0.02)
+        pydirectinput.press('h')
+        pydirectinput.press('enter')
         return self.get_observation()
 
     def get_observation(self):

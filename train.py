@@ -31,7 +31,7 @@ def jogar(modelo: str):
     # Fazendo jogar com o modelo salvo
     env = ScreenGame()
     model = DQN.load(modelo)
-    for episode in range(1):
+    for episode in range(2):
         obs = env.reset()
         total_reward = 0
         done = False
@@ -57,8 +57,8 @@ def samplegame(episodes):
 
 
 def main():
-    jogar('./save/model_000000.zip')
-    train(pesos=None)
+    jogar('./save/best_model_88000.zip')
+    # train(pesos=None)
     # samplegame()
 
 
