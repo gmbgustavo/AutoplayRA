@@ -30,7 +30,7 @@ class ScreenGame(Env):
         self.cap = mss()    # Instancia a função de screenshot
         # Coordenadas do jogo, o espaço de observação.
         self.frame = 0
-        self.game_location = {'top': 300, 'left': 0, 'width': 600, 'height': 500}
+        self.game_location = {'top': 30, 'left': 40, 'width': 520, 'height': 380}
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
         self.done_location = (637, 376, 302, 87)    # top, left, width, height
         self.action_map = {
