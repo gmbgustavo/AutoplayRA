@@ -18,7 +18,7 @@ callback = TrainAndLoggingCallback(check_freq=200, save_path=SAVE_DIR)
 def train(pesos=None):
     env = ScreenGame()
     model = DQN('CnnPolicy', env, exploration_fraction=0.70, optimize_memory_usage=True,
-                learning_rate=0.0099, buffer_size=100_000,
+                learning_rate=0.0099, buffer_size=100_000, replay_buffer_kwargs={'handle_timeout_termination': False},
                 gamma=0.98, exploration_initial_eps=0.99, exploration_final_eps=0.15,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1, learning_starts=10)
     if pesos is not None:
@@ -58,8 +58,8 @@ def samplegame(episodes):
 
 def main():
     # jogar('./save/best_model_88000.zip')
-    # train(pesos=None)
-    samplegame(2)
+    train(pesos=None)
+    # samplegame(2)
 
 
 if __name__ == '__main__':

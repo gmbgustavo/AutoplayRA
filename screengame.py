@@ -14,7 +14,6 @@ import pydirectinput    # Send commands
 import numpy as np
 import time
 import cv2
-import pytesseract
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
@@ -24,31 +23,29 @@ class ScreenGame(Env):
 
     def __init__(self):
         super().__init__()
-        self.observation_space = Box(low=0, high=255, shape=(1, 260, 190), dtype=np.uint8)
-        self.action_space = Discrete(3)    # Up, down, noop
+        self.observation_space = Box(low=0, high=255, shape=(1, 120, 190), dtype=np.uint8)
+        self.action_space = Discrete(2)    # Up, noop
         self.cap_obs = mss()    # Instancia a função de screenshot
         # Coordenadas do jogo, o espaço de observação.
-        self.game_location = {'top': 30, 'left': 40, 'width': 520, 'height': 380}
-        self.score_location = {'top': 140, 'left': 65, 'width': 60, 'height': 15}
+        self.game_location = {'top': 30, 'left': 60, 'width': 240, 'height': 380}
+        self.score_location = {'top': 50, 'left': 140, 'width': 60, 'height': 40}
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
         self.begin_time = int(time.time())
         self.done_time = 136    # Tempo de cada episodio
         self.reward = 0
+
         self.action_map = {
             0: 'up',    # Seta para cima
-            1: 'down',    # Seta para baixo
-            2: 'noop',    # Nothing
+            1: 'noop',    # Nothing
         }
 
     def step(self, action):    # Step é como passamos as ações para o jogo
-        # 0 - UP . 1 - DOWN . 2 - NOOP
-        if action != 2:
+        # 0 - UP . 1 - NOOP
+        if action != 1:
             pydirectinput.press(self.action_map[action])    # Ação será passada pelo treinamento
         # Check if done
         done = self.get_done()
         new_obs = self.get_observation()
-        if self.reward == self.get_points():
-            self.reward += 1
         info = {'reward': self.reward}
         return new_obs, self.reward, done, info
 
@@ -68,8 +65,8 @@ class ScreenGame(Env):
         raw = np.array(self.cap_obs.grab(self.game_location))[:, :, :3]    # Toda altura, toda largura e 3 canais
         # Tratamento da imagem para redução de tamanho
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
-        resized = cv2.resize(gray, (260, 190))    # Coloca do tamanho do Box
-        observation = np.reshape(resized, (1, 260, 190))    # Troca a ordem para coincidir com o padrão Box
+        resized = cv2.resize(gray, (120, 190))    # Coloca do tamanho do Box
+        observation = np.reshape(resized, (1, 120, 190))    # Troca a ordem para coincidir com o padrão Box
         return observation
 
     def get_done(self):
@@ -82,9 +79,7 @@ class ScreenGame(Env):
 
     def get_points(self):
         score = np.array(self.cap_obs.grab(self.score_location))
-        txt_score = pytesseract.image_to_string(image=score, lang='eng')
-        print(txt_score)
-        return txt_score
+        return score
 
     def close(self):
         pydirectinput.keyDown('alt')
