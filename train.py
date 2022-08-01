@@ -12,18 +12,18 @@ import time
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save'
-callback = TrainAndLoggingCallback(check_freq=1000, save_path=SAVE_DIR)
+callback = TrainAndLoggingCallback(check_freq=200, save_path=SAVE_DIR)
 
 
 def train(pesos=None):
     env = ScreenGame()
     model = DQN('CnnPolicy', env, exploration_fraction=0.70, optimize_memory_usage=True,
-                learning_rate=0.0099, buffer_size=500_000,
+                learning_rate=0.0099, buffer_size=100_000,
                 gamma=0.98, exploration_initial_eps=0.99, exploration_final_eps=0.15,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1, learning_starts=10)
     if pesos is not None:
         model.load(pesos)
-    model.learn(total_timesteps=20_000_000, callback=callback)
+    model.learn(total_timesteps=1000, callback=callback)
     return None
 
 
@@ -57,9 +57,9 @@ def samplegame(episodes):
 
 
 def main():
-    jogar('./save/best_model_88000.zip')
+    # jogar('./save/best_model_88000.zip')
     # train(pesos=None)
-    # samplegame()
+    samplegame(2)
 
 
 if __name__ == '__main__':

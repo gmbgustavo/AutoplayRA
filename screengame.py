@@ -12,30 +12,31 @@ The inputs are keyboard strikes done with pydirectinput
 
 import pydirectinput    # Send commands
 import numpy as np
-import pyautogui
 import time
 import cv2
+import pytesseract
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
-from stable_baselines3 import DQN
 
 
 class ScreenGame(Env):
 
     def __init__(self):
         super().__init__()
-        self.observation_space = Box(low=0, high=255, shape=(1, 83, 100), dtype=np.uint8)
+        self.observation_space = Box(low=0, high=255, shape=(1, 260, 190), dtype=np.uint8)
         self.action_space = Discrete(3)    # Up, down, noop
-        self.cap = mss()    # Instancia a função de screenshot
+        self.cap_obs = mss()    # Instancia a função de screenshot
         # Coordenadas do jogo, o espaço de observação.
-        self.frame = 0
         self.game_location = {'top': 30, 'left': 40, 'width': 520, 'height': 380}
+        self.score_location = {'top': 140, 'left': 65, 'width': 60, 'height': 15}
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
-        self.done_location = (637, 376, 302, 87)    # top, left, width, height
+        self.begin_time = int(time.time())
+        self.done_time = 136    # Tempo de cada episodio
+        self.reward = 0
         self.action_map = {
-            0: 'arrow_up',   # sobe
-            1: 'arrow_down',    # desce
+            0: 0xC8,    # Seta para cima
+            1: 0xD0,    # Seta para baixo
             2: 'noop',    # Nothing
         }
 
@@ -46,10 +47,10 @@ class ScreenGame(Env):
         # Check if done
         done = self.get_done()
         new_obs = self.get_observation()
-        reward = 1    # Um ponto para cada frame
-        self.frame += 1
-        info = {'frame': self.frame, 'reward': reward}
-        return new_obs, reward, done, info
+        if self.reward == self.get_points():
+            self.reward += 1
+        info = {'reward': self.reward}
+        return new_obs, self.reward, done, info
 
     def render(self, mode="human"):
         pass
@@ -58,34 +59,40 @@ class ScreenGame(Env):
         time.sleep(0.02)
         pydirectinput.press('h')
         pydirectinput.press('enter')
+        self.begin_time = int(time.time())
+        self.reward = 0
         return self.get_observation()
 
     def get_observation(self):
         # Grab a raw captura of the game. mss returns 4 channels, we are grabbing just 3 (rgb)
-        raw = np.array(self.cap.grab(self.game_location))[:, :, :3]    # Toda altura, toda largura e 3 canais
+        raw = np.array(self.cap_obs.grab(self.game_location))[:, :, :3]    # Toda altura, toda largura e 3 canais
         # Tratamento da imagem para redução de tamanho
         gray = cv2.cvtColor(raw, cv2.COLOR_BGR2GRAY)
-        resized = cv2.resize(gray, (100, 83))    # Coloca do tamanho do Box
-        observation = np.reshape(resized, (1, 83, 100))    # Troca a ordem para coincidir com o padrão Box
+        resized = cv2.resize(gray, (260, 190))    # Coloca do tamanho do Box
+        observation = np.reshape(resized, (1, 260, 190))    # Troca a ordem para coincidir com o padrão Box
         return observation
 
     def get_done(self):
         done = False
-        res = pyautogui.locateOnScreen('./resources/gameover.jpg',
-                                       region=self.done_location,
-                                       confidence=0.75,
-                                       grayscale=True)
-        if res is not None:
-            done = True
-        return done
+        time_elapsed = int(time.time()) - int(self.begin_time)
+        if time_elapsed >= self.done_time:
+            return True
+        else:
+            return done
+
+    def get_points(self):
+        score = np.array(self.cap_obs.grab(self.score_location))
+        txt_score = pytesseract.image_to_string(image=score, lang='eng')
+        print(txt_score)
+        return txt_score
 
     def close(self):
-        pass
+        pydirectinput.keyDown('alt')
+        pydirectinput.press('f4')
+        pydirectinput.keyUp('alt')
+        return None
 
 
 if __name__ == "__main__":
     print('Essa classe não deve ser executada diretamente.')
-
-
-
 
