@@ -35,8 +35,8 @@ class ScreenGame(Env):
         self.done_time = 136    # Tempo de cada episodio
         self.reward = 0
         self.action_map = {
-            0: 0xC8,    # Seta para cima
-            1: 0xD0,    # Seta para baixo
+            0: 'up',    # Seta para cima
+            1: 'down',    # Seta para baixo
             2: 'noop',    # Nothing
         }
 
