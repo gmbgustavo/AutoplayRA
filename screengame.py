@@ -18,7 +18,7 @@ import cv2
 from mss import mss    # Get screenshots
 from gym import Env
 from gym.spaces import Discrete, Box    # Discrete for commands and Box to environment
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 class ScreenGame(Env):
@@ -30,12 +30,12 @@ class ScreenGame(Env):
         self.cap_obs = mss()    # Instancia a função de screenshot
         # Coordenadas do jogo, o espaço de observação.
         self.game_location = {'top': 30, 'left': 60, 'width': 240, 'height': 380}
-        self.score_location = {'top': 150, 'left': 420, 'width': 30, 'height': 20}    # 180 460
+        self.score_location = {'top': 140, 'left': 410, 'width': 60, 'height': 40}    # 180 460
         # Coordenadas da tela onde está a informação de game over para definir se o episodio terminou.
         self.begin_time = int(time.time())
         self.done_time = 136    # Tempo de cada episodio
         self.reward = 0
-        self.galinha = Image.open('./resources/galinha.png')
+        self.galinha = ImageOps.grayscale(Image.open('./resources/galinha.png'))
 
         self.action_map = {
             0: 'up',    # Seta para cima
@@ -83,9 +83,8 @@ class ScreenGame(Env):
 
     def get_points(self):
         # score = np.array(self.cap_obs.grab(self.score_location))
-        score = pyautogui.locateOnScreen(self.galinha, region=self.score_location, confidence=0.7, grayscale=True)
-        print(score)
-        if score:
+        score = pyautogui.locateOnScreen(self.galinha, region=self.score_location, confidence=0.8, grayscale=True)
+        if score is not None:
             return 1
         else:
             return 0
