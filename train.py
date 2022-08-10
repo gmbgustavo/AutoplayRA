@@ -57,9 +57,10 @@ def samplegame(episodes):
 
 
 def main():
+    time.sleep(1)
     # jogar('./save/best_model_88000.zip')
-    train(pesos=None)
-    # samplegame(2)
+    # train(pesos=None)
+    samplegame(2)
 
 
 if __name__ == '__main__':

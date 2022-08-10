@@ -49,6 +49,7 @@ class ScreenGame(Env):
         # Check if done
         done = self.get_done()
         new_obs = self.get_observation()
+        self.reward = self.get_points()
         info = {'reward': self.reward}
         return new_obs, self.reward, done, info
 
@@ -82,8 +83,13 @@ class ScreenGame(Env):
 
     def get_points(self):
         # score = np.array(self.cap_obs.grab(self.score_location))
-        score = pyautogui.locateOnScreen(self.galinha)
+        score = pyautogui.locateOnScreen(self.galinha, region=self.score_location, confidence=0.7, grayscale=True)
         print(score)
+        if score:
+            return 1
+        else:
+            return 0
+
         return score
 
     def close(self):
