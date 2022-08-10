@@ -89,8 +89,6 @@ class ScreenGame(Env):
         else:
             return 0
 
-        return score
-
     def close(self):
         pydirectinput.keyDown('alt')
         pydirectinput.press('f4')
