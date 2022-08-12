@@ -11,33 +11,32 @@ from gym.spaces import Box, Discrete    # Wrappers
 from gym import Env    # Clase ambiente básica
 
 
-JOGO = 'ALE/SpaceInvaders-v5'
+JOGO = 'ALE/Frogger-v5'
 
 
 class AtariGames(Env):
 
-    def __init__(self, mode=None):
+    def __init__(self, mode=None, game=JOGO):
         super().__init__()
         self.observation_space = Box(low=0, high=255, shape=(105, 80, 1), dtype=np.uint8)
-        self.action_space = Discrete(18)
-        a = gym.envs.register
-        self.game = gym.make(JOGO,
+        self.action_space = Discrete(5)
+        self.game = gym.make(game,
                              obs_type='grayscale',    # ram | rgb | grayscale
                              frameskip=1,    # frame skip
                              mode=0,    # game mode, see Machado et al. 2018
                              difficulty=0,    # game difficulty, see Machado et al. 2018
-                             repeat_action_probability=0.15,    # Sticky action probability
-                             full_action_space=True,    # Use all actions or just the useful ones(False)
+                             repeat_action_probability=0.4,    # Sticky action probability
+                             full_action_space=False,    # Use all actions or just the useful ones(False)
                              render_mode=mode,     # None | human | rgb_array
-                             max_episode_steps=10000,
+                             max_episode_steps=40000,
                              autoreset=True)
-        self.vidas = 3
+        self.vidas = 4
         self.total_score = 0
 
     def reset(self, *args):
         obs = self.game.reset()
         obs = self.preprocess(obs)
-        self.vidas = 3
+        self.vidas = 4
         self.total_score = 0
         return obs
 
@@ -48,6 +47,7 @@ class AtariGames(Env):
         info['total_score'] = self.total_score
         if info['lives'] < self.vidas:
             self.vidas = info['lives']
+            reward -= 1
         return obs, reward, done, info
 
     def render(self, mode=None):
