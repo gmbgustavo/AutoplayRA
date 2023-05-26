@@ -1,6 +1,6 @@
 """
 Treinamento da classe do ambiente gym customizado
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 """
 
 import callback    # Classe personalizada. Esta na mesma pasta
