@@ -4,17 +4,19 @@ Importação das roms python -m retro.import  ./romfolder
 Essa classe cria um jogo usando um ambiente custmoizado
 """
 
-import numpy as np
 import cv2
+import numpy as np
+from gym.spaces import Discrete, Box
+from gym import Env
+from stable_baselines3 import DQN
+from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 import gym
-from gym.spaces import Box, Discrete    # Wrappers
-from gym import Env    # Clase ambiente básica
-
 
 JOGO = 'ALE/Frogger-v5'
 
 
 class AtariGames(Env):
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 3}
 
     def __init__(self, mode=None, game=JOGO):
         super().__init__()
@@ -41,13 +43,9 @@ class AtariGames(Env):
         return obs
 
     def step(self, action):
-        obs, reward, done, info = self.game.step(action)
+        obs, reward, done, _, info = self.game.step(action)
         obs = self.preprocess(obs)
         self.total_score += reward
-        info['total_score'] = self.total_score
-        if info['lives'] < self.vidas:
-            self.vidas = info['lives']
-            reward -= 1
         return obs, reward, done, info
 
     def render(self, mode=None):
@@ -67,6 +65,7 @@ class AtariGames(Env):
         :return:
         """
         # gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)    # Grayscale - já aplicado na instância do gym
+        observation = np.asarray(observation[0])
         resize = cv2.resize(observation, (105, 80), interpolation=cv2.INTER_CUBIC)    # Diminiu a observação
         channels = np.reshape(resize, (105, 80, 1))
         return channels

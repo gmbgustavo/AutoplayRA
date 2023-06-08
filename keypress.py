@@ -1,5 +1,7 @@
+import time
+
 import pydirectinput
 
-
-pydirectinput.press(keys='z', interval=0.01, presses=1_000_000)
+time.sleep(1)
+pydirectinput.press(keys='z', interval=0.05, presses=500_000)
 
