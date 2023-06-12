@@ -21,7 +21,7 @@ def train(steps, pesos=None):
     env = AtariGames()
     env = Monitor(env, LOG_DIR)
     env = VecFrameStack(DummyVecEnv([lambda: env]), n_stack=4, channels_order='last')
-    model = DQN('CnnPolicy', env, exploration_fraction=0.75, optimize_memory_usage=True,
+    model = DQN('CnnPolicy', env, exploration_fraction=0.75, optimize_memory_usage=False,
                 learning_rate=0.01, buffer_size=1_000,
                 gamma=0.98, exploration_initial_eps=0.99, exploration_final_eps=0.2,
                 tensorboard_log=LOG_DIR, device='cuda', verbose=1)

@@ -32,20 +32,15 @@ class AtariGames(Env):
                              render_mode=mode,     # None | human | rgb_array
                              max_episode_steps=40000,
                              autoreset=True)
-        self.vidas = 4
-        self.total_score = 0
 
     def reset(self, *args):
         obs = self.game.reset()
         obs = self.preprocess(obs)
-        self.vidas = 4
-        self.total_score = 0
         return obs
 
     def step(self, action):
         obs, reward, done, _, info = self.game.step(action)
         obs = self.preprocess(obs)
-        self.total_score += reward
         return obs, reward, done, info
 
     def render(self, mode=None):
