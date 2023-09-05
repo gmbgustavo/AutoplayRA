@@ -14,7 +14,7 @@ from stable_baselines3.common.evaluation import evaluate_policy
 LOG_DIR = './logs'
 OPT_DIR = './opt'    # Diretorio para otimizações dos hiperparametros
 SAVE_DIR = './save'
-callback = callback.TrainAndLoggingCallback(check_freq=2_000_000, save_path=SAVE_DIR)
+callback = callback.TrainAndLoggingCallback(check_freq=2_500_000, save_path=SAVE_DIR)
 
 
 def train(steps, pesos=None):
@@ -56,7 +56,7 @@ def avaliar(pesos=None):
 
 def main():
     # print(avaliar('./save/model_30000000'))
-    train(pesos=None, steps=300_000)
+    train(pesos='save/model_10000000.zip', steps=10_000_000)
 
 
 if __name__ == '__main__':
