@@ -1,7 +1,9 @@
 import time
 
-import pydirectinput
+import pyautogui
 
-time.sleep(1)
-pydirectinput.press(keys='z', interval=0.05, presses=500_000)
-
+time.sleep(3)
+while True:
+    pyautogui.leftClick(x=739, y=431)
+    time.sleep(16)
+    pyautogui.press('enter')

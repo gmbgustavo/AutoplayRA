@@ -18,6 +18,7 @@ GAMEBLEFT = (140, 190, 120, 120)
 GAMEBRIGHT = (350, 190, 120, 120)
 GAMEBFLIP = [8, 11, 13, 14, 16, 18, 25, 28, 31, 33, 38, 40, 41, 46, 48]    # Handles some exceptions in game B
 SALOON = (30, 70, 500, 300)
+pyautogui.FAILSAFE = True
 
 
 def main(game: str):
@@ -34,40 +35,44 @@ def main(game: str):
         gang4 = ImageOps.grayscale(Image.open('../opt/wg/b4.png'))
         gang5 = ImageOps.grayscale(Image.open('../opt/wg/b5.png'))
         while True:
-            t1 = pyautogui.locateOnScreen(gang1, region=SALOON, confidence=0.85, grayscale=True)
-            if t1 is not None:
-                pyautogui.mouseDown(t1[0], t1[1])
-                pyautogui.mouseUp()
-                mendown += 1
-                print(f'Gang 1 down! - Total {mendown}')
+            try:
+                t1 = pyautogui.locateOnScreen(gang1, region=SALOON, confidence=0.85, grayscale=True)
+                if t1 is not None:
+                    pyautogui.mouseDown(t1[0], t1[1])
+                    pyautogui.mouseUp()
+                    mendown += 1
+                    print(f'Gang 1 down! - Total {mendown}')
 
-            t2 = pyautogui.locateOnScreen(gang2, region=SALOON, confidence=0.85, grayscale=True)
-            if t2 is not None:
-                pyautogui.mouseDown(t2[0], t2[1])
-                pyautogui.mouseUp()
-                mendown += 1
-                print(f'Gang 2 down! - Total {mendown}')
+                t2 = pyautogui.locateOnScreen(gang2, region=SALOON, confidence=0.85, grayscale=True)
+                if t2 is not None:
+                    pyautogui.mouseDown(t2[0], t2[1])
+                    pyautogui.mouseUp()
+                    mendown += 1
+                    print(f'Gang 2 down! - Total {mendown}')
 
-            t3 = pyautogui.locateOnScreen(gang3, region=SALOON, confidence=0.85, grayscale=True)
-            if t3 is not None:
-                pyautogui.mouseDown(t3[0], t3[1])
-                pyautogui.mouseUp()
-                mendown += 1
-                print(f'Gang 3 down! - Total {mendown}')
+                t3 = pyautogui.locateOnScreen(gang3, region=SALOON, confidence=0.85, grayscale=True)
+                if t3 is not None:
+                    pyautogui.mouseDown(t3[0], t3[1])
+                    pyautogui.mouseUp()
+                    mendown += 1
+                    print(f'Gang 3 down! - Total {mendown}')
 
-            t4 = pyautogui.locateOnScreen(gang4, region=SALOON, confidence=0.7, grayscale=True)
-            if t4 is not None:
-                pyautogui.mouseDown(t4[0] + 10, t4[1] + 10)
-                pyautogui.mouseUp()
-                mendown += 1
-                print(f'Gang 4 down! - Total {mendown}')
+                t4 = pyautogui.locateOnScreen(gang4, region=SALOON, confidence=0.7, grayscale=True)
+                if t4 is not None:
+                    pyautogui.mouseDown(t4[0] + 10, t4[1] + 10)
+                    pyautogui.mouseUp()
+                    mendown += 1
+                    print(f'Gang 4 down! - Total {mendown}')
 
-            t5 = pyautogui.locateOnScreen(gang5, region=SALOON, confidence=0.85, grayscale=True)
-            if t5 is not None:
-                pyautogui.mouseDown(t5[0], t5[1])
-                pyautogui.mouseUp()
-                mendown += 1
-                print(f'Gang 5 down! - Total {mendown}')
+                t5 = pyautogui.locateOnScreen(gang5, region=SALOON, confidence=0.85, grayscale=True)
+                if t5 is not None:
+                    pyautogui.mouseDown(t5[0], t5[1])
+                    pyautogui.mouseUp()
+                    mendown += 1
+                    print(f'Gang 5 down! - Total {mendown}')
+            except pyautogui.ImageNotFoundException:
+                print("\rSearching...", end='')
+                mendown = 0
 
     elif game == 'A':
         fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))   # Shared by every target
@@ -102,4 +107,4 @@ def main(game: str):
 
 
 if __name__ == '__main__':
-    main(game='B')
+    main(game='C')
