@@ -34,6 +34,7 @@ def main(game: str):
         gang3 = ImageOps.grayscale(Image.open('../opt/wg/b3.png'))
         gang4 = ImageOps.grayscale(Image.open('../opt/wg/b4.png'))
         gang5 = ImageOps.grayscale(Image.open('../opt/wg/b5.png'))
+        mendown = 0
         while True:
             try:
                 t1 = pyautogui.locateOnScreen(gang1, region=SALOON, confidence=0.85, grayscale=True)
@@ -72,38 +73,45 @@ def main(game: str):
                     print(f'Gang 5 down! - Total {mendown}')
             except pyautogui.ImageNotFoundException:
                 print("\rSearching...", end='')
-                mendown = 0
+
 
     elif game == 'A':
         fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))   # Shared by every target
         while True:
-            target = pyautogui.locateOnScreen(fire, region=GAMEA, confidence=0.85, grayscale=True)
-            if target is not None:
-                pyautogui.mouseDown(target[0], target[1])
-                pyautogui.mouseUp()
-                mendown += 1
-                print(f'Gang down! - Total {mendown}')
-                time.sleep(4)    # Prevents from shooting twice and saves a little processing
+            try:
+                target = pyautogui.locateOnScreen(fire, region=GAMEA, confidence=0.85, grayscale=True)
+                if target is not None:
+                    pyautogui.mouseDown(target[0], target[1])
+                    pyautogui.mouseUp()
+                    mendown += 1
+                    print(f'Gang down! - Total {mendown}')
+                    time.sleep(4)    # Prevents from shooting twice and saves a little processing
+            except pyautogui.ImageNotFoundException:
+                print("\rSearching...", end='')
+
 
     elif game == 'B':
         level = 1
         offset = 210
         fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))  # Shared by every target
         while True:
-            if level not in GAMEBFLIP:
-                target = pyautogui.locateOnScreen(fire, region=GAMEBLEFT, confidence=0.85, grayscale=True)
-            else:
-                target = pyautogui.locateOnScreen(fire, region=GAMEBRIGHT, confidence=0.85, grayscale=True)
-                offset = -abs(offset)
-            if target is not None:
-                pyautogui.mouseDown(target[0], target[1])
-                pyautogui.mouseUp()
-                pyautogui.mouseDown(target[0] + offset, target[1] - 10)
-                pyautogui.mouseUp()
-                print(f'Cleared round: {level}')
-                # time.sleep(2)
-                level += 1
-                offset = abs(offset)
+            try:
+                if level not in GAMEBFLIP:
+                    target = pyautogui.locateOnScreen(fire, region=GAMEBLEFT, confidence=0.85, grayscale=True)
+                else:
+                    target = pyautogui.locateOnScreen(fire, region=GAMEBRIGHT, confidence=0.85, grayscale=True)
+                    offset = -abs(offset)
+                if target is not None:
+                    pyautogui.mouseDown(target[0], target[1])
+                    pyautogui.mouseUp()
+                    pyautogui.mouseDown(target[0] + offset, target[1] - 10)
+                    pyautogui.mouseUp()
+                    print(f'Cleared round: {level}')
+                    # time.sleep(2)
+                    level += 1
+                    offset = abs(offset)
+            except pyautogui.ImageNotFoundException:
+                print("\rSearching...", end='')
 
 
 if __name__ == '__main__':

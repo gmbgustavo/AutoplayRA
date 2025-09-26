@@ -23,36 +23,30 @@ CAN2 = ImageOps.grayscale(Image.open('../opt/ha/can2.png'))
 
 def main():
     while True:
-        bandido = pyautogui.locateOnScreen(GA, region=REGIAO, confidence=0.8, grayscale=True)
-        if bandido is not None:
-            pyautogui.mouseDown(bandido[0], bandido[1])
-            pyautogui.mouseUp()
-            print(f'GANG-A: {bandido}')
+        try:
+            bandido = pyautogui.locateOnScreen(GA, region=REGIAO, confidence=0.8, grayscale=True)
+            if bandido is not None:
+                pyautogui.mouseDown(bandido[0], bandido[1])
+                pyautogui.mouseUp()
+                print(f'GANG-A: {bandido}')
 
-        bandido2 = pyautogui.locateOnScreen(GB, region=REGIAO, confidence=0.8, grayscale=True)
-        if bandido2 is not None:
-            pyautogui.mouseDown(bandido2[0], bandido2[1])
-            pyautogui.mouseUp()
-            print(f'GANG-B: {bandido2}')
+            bandido2 = pyautogui.locateOnScreen(GB, region=REGIAO, confidence=0.8, grayscale=True)
+            if bandido2 is not None:
+                pyautogui.mouseDown(bandido2[0], bandido2[1])
+                pyautogui.mouseUp()
+                print(f'GANG-B: {bandido2}')
 
-        bandido3 = pyautogui.locateOnScreen(GC, region=REGIAO, confidence=0.8, grayscale=True)
-        if bandido3 is not None:
-            pyautogui.mouseDown(bandido3[0], bandido3[1])
-            pyautogui.mouseUp()
-            print(f'GANG-C: {bandido3}')
+            bandido3 = pyautogui.locateOnScreen(GC, region=REGIAO, confidence=0.8, grayscale=True)
+            if bandido3 is not None:
+                pyautogui.mouseDown(bandido3[0], bandido3[1])
+                pyautogui.mouseUp()
+                print(f'GANG-C: {bandido3}')
+        except pyautogui.ImageNotFoundException:
+            continue
 
 
 def trickshot():
-    while True:
-        can1 = pyautogui.locateOnScreen(CAN1, region=TRICKSHOT, confidence=0.8, grayscale=True)
-        if can1 is not None:
-            pyautogui.mouseDown(can1[0], can1[1])
-            pyautogui.mouseUp()
-
-        can2 = pyautogui.locateOnScreen(CAN2, region=TRICKSHOT, confidence=0.8, grayscale=True)
-        if can2 is not None:
-            pyautogui.mouseDown(can2[0], can2[1])
-            pyautogui.mouseUp()
+    pass
 
 
 if __name__ == '__main__':
