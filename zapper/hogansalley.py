@@ -42,7 +42,7 @@ def main():
                 pyautogui.mouseUp()
                 print(f'GANG-C: {bandido3}')
         except pyautogui.ImageNotFoundException:
-            continue
+            print("\rSearching...", end='')
 
 
 def trickshot():

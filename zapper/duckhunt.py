@@ -32,7 +32,7 @@ def main():
                 pyautogui.mouseUp()
                 print(f'Duck template 2 down!: {duck2}')
         except pyautogui.ImageNotFoundException:
-            continue
+            print("\rSearching...", end='')
 
 
 if __name__ == '__main__':
