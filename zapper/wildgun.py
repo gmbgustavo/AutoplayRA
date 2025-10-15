@@ -1,9 +1,8 @@
 """
 Wild Gunman autoplay.
-- Use grayscale
-- Use minimum confidence 0.75
+- Set confidence betwee 0.7 and 0.85
 - Use retroarch Fceum core
-- Using 2x window in RetroAarch
+- Using 3x window in RetroAarch, move it to the top left corner
 - Max up zapper tolerance (fceum core options)
 """
 
@@ -13,7 +12,7 @@ from PIL import Image, ImageOps
 
 
 GAMEMODES = ['A', 'B', 'C']
-GAMEA = (270, 220, 80, 80)    # Small area around the eyes
+GAMEA = (356, 311, 211, 250)    # Small area around the eyes
 GAMEBLEFT = (140, 190, 120, 120)
 GAMEBRIGHT = (350, 190, 120, 120)
 GAMEBFLIP = [8, 11, 13, 14, 16, 18, 25, 28, 31, 33, 38, 40, 41, 46, 48]    # Handles some exceptions in game B
@@ -37,49 +36,49 @@ def main(game: str):
         mendown = 0
         while True:
             try:
-                t1 = pyautogui.locateOnScreen(gang1, region=SALOON, confidence=0.85, grayscale=True)
+                t1 = pyautogui.locateOnScreen(gang1, region=SALOON, confidence=0.80, grayscale=False)
                 if t1 is not None:
                     pyautogui.mouseDown(t1[0], t1[1])
                     pyautogui.mouseUp()
                     mendown += 1
                     print(f'Gang 1 down! - Total {mendown}')
 
-                t2 = pyautogui.locateOnScreen(gang2, region=SALOON, confidence=0.85, grayscale=True)
+                t2 = pyautogui.locateOnScreen(gang2, region=SALOON, confidence=0.80, grayscale=False)
                 if t2 is not None:
                     pyautogui.mouseDown(t2[0], t2[1])
                     pyautogui.mouseUp()
                     mendown += 1
                     print(f'Gang 2 down! - Total {mendown}')
 
-                t3 = pyautogui.locateOnScreen(gang3, region=SALOON, confidence=0.85, grayscale=True)
+                t3 = pyautogui.locateOnScreen(gang3, region=SALOON, confidence=0.80, grayscale=False)
                 if t3 is not None:
                     pyautogui.mouseDown(t3[0], t3[1])
                     pyautogui.mouseUp()
                     mendown += 1
                     print(f'Gang 3 down! - Total {mendown}')
 
-                t4 = pyautogui.locateOnScreen(gang4, region=SALOON, confidence=0.7, grayscale=True)
+                t4 = pyautogui.locateOnScreen(gang4, region=SALOON, confidence=0.75, grayscale=False)
                 if t4 is not None:
                     pyautogui.mouseDown(t4[0] + 10, t4[1] + 10)
                     pyautogui.mouseUp()
                     mendown += 1
                     print(f'Gang 4 down! - Total {mendown}')
 
-                t5 = pyautogui.locateOnScreen(gang5, region=SALOON, confidence=0.85, grayscale=True)
+                t5 = pyautogui.locateOnScreen(gang5, region=SALOON, confidence=0.75, grayscale=False)
                 if t5 is not None:
                     pyautogui.mouseDown(t5[0], t5[1])
                     pyautogui.mouseUp()
                     mendown += 1
                     print(f'Gang 5 down! - Total {mendown}')
             except pyautogui.ImageNotFoundException:
-                print("\rSearching...", end='')
+                print("\rScanning...", end='')
 
 
     elif game == 'A':
-        fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))   # Shared by every target
+        fire = Image.open('../opt/wg/fireeyes.png')   # Shared by every target
         while True:
             try:
-                target = pyautogui.locateOnScreen(fire, region=GAMEA, confidence=0.85, grayscale=True)
+                target = pyautogui.locateOnScreen(fire, region=GAMEA, confidence=0.7, grayscale=False)
                 if target is not None:
                     pyautogui.mouseDown(target[0], target[1])
                     pyautogui.mouseUp()
@@ -87,19 +86,19 @@ def main(game: str):
                     print(f'Gang down! - Total {mendown}')
                     time.sleep(4)    # Prevents from shooting twice and saves a little processing
             except pyautogui.ImageNotFoundException:
-                print("\rSearching...", end='')
+                print("\rScanning...", end='')
 
 
     elif game == 'B':
         level = 1
         offset = 210
-        fire = ImageOps.grayscale(Image.open('../opt/wg/fireeye.png'))  # Shared by every target
+        fire = Image.open('../opt/wg/fireeyes.png')  # Shared by every target
         while True:
             try:
                 if level not in GAMEBFLIP:
-                    target = pyautogui.locateOnScreen(fire, region=GAMEBLEFT, confidence=0.85, grayscale=True)
+                    target = pyautogui.locateOnScreen(fire, region=GAMEBLEFT, confidence=0.75, grayscale=False)
                 else:
-                    target = pyautogui.locateOnScreen(fire, region=GAMEBRIGHT, confidence=0.85, grayscale=True)
+                    target = pyautogui.locateOnScreen(fire, region=GAMEBRIGHT, confidence=0.75, grayscale=False)
                     offset = -abs(offset)
                 if target is not None:
                     pyautogui.mouseDown(target[0], target[1])
@@ -107,12 +106,12 @@ def main(game: str):
                     pyautogui.mouseDown(target[0] + offset, target[1] - 10)
                     pyautogui.mouseUp()
                     print(f'Cleared round: {level}')
-                    # time.sleep(2)
+                    time.sleep(2)
                     level += 1
                     offset = abs(offset)
             except pyautogui.ImageNotFoundException:
-                print("\rSearching...", end='')
+                print("\rScanning...", end='')
 
 
 if __name__ == '__main__':
-    main(game='C')
+    main('A')
